@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hectare Are Sq.Mtr to Acre Guntha Calculator</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #eff6ff;
+            --accent: #0d9488;
+            --accent-light: #ccfbf1;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --bg-body: #f3f4f6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .calculator-card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            max-width: 550px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary);
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .input-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15);
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 6px;
+            text-align: center;
+        }
+
+        .output-box {
+            background-color: var(--accent-light);
+            border-left: 5px solid var(--accent);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .output-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            font-weight: 700;
+            margin: 0 0 6px 0;
+        }
+
+        .output-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .steps-container {
+            background-color: var(--primary-light);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #dbeafe;
+            margin-bottom: 20px;
+        }
+
+        .steps-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 12px;
+            border-bottom: 1px dashed #bfdbfe;
+            padding-bottom: 6px;
+        }
+
+        .step-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .step-num {
+            font-weight: bold;
+            color: var(--primary);
+            margin-right: 8px;
+        }
+
+        .step-text {
+            flex-grow: 1;
+            color: var(--text-main);
+        }
+
+        .step-calc {
+            font-family: monospace;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .calculator-footer {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-top: 1px solid #e5e7eb;
+            padding-top: 15px;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator-card">
+    <h2>Land Area Converter</h2>
+    
+    <div class="input-box">
+        <label for="landInput">Enter Land Area Value</label>
+        <input type="text" id="landInput" value="1.60.57" placeholder="e.g., 1.60.57 or 16057" oninput="processConversion()">
+        <div class="input-hint">Accepts format: <b>1.60.57</b> (Hectare.Are.Cent) or direct <b>16057</b> (Sq.Mtr)</div>
+    </div>
+
+    <div class="output-box">
+        <p class="output-label">Final Result</p>
+        <div class="output-value" id="finalResult">3 Acre and 39 Guntha</div>
+    </div>
+
+    <div class="steps-container">
+        <h3 class="steps-title">Live Mathematical Breakdown</h3>
+        <div id="stepsList">
+            <!-- Dynamic calculation tracking updates here -->
+        </div>
+    </div>
+
+    <div class="calculator-footer">
+        &copy; 2026 All Rights Reserved | Engineered by NAKUL KAPDI
+    </div>
+</div>
+
+<script>
+function processConversion() {
+    let rawInput = document.getElementById('landInput').value.trim();
+    
+    if (!rawInput) {
+        document.getElementById('finalResult').innerText = "0 Acre and 0 Guntha";
+        document.getElementById('stepsList').innerHTML = "<p style='color:#9ca3af; font-size:14px; margin:0;'>Please enter a valid area number.</p>";
+        return;
+    }
+
+    let sqMeters = 0;
+    let interpretationText = "";
+
+    // 1. Convert input notation directly to pure Square Meters
+    if (rawInput.includes('.')) {
+        // Strip out dots to join them as a single clean integer (e.g., 1.60.57 -> 16057)
+        let cleanNumber = rawInput.replace(/\./g, "");
+        sqMeters = parseFloat(cleanNumber) || 0;
+        interpretationText = `Interpreted format <b>${rawInput}</b> → <b>${sqMeters}</b> Sq.Mtr`;
+    } else {
+        sqMeters = parseFloat(rawInput) || 0;
+        interpretationText = `Direct Square Meters value entered: <b>${sqMeters}</b>`;
+    }
+
+    // Guard rule if parsed value is zero or non-numeric
+    if (sqMeters <= 0 || isNaN(sqMeters)) {
+        document.getElementById('finalResult').innerText = "0 Acre and 0 Guntha";
+        return;
+    }
+
+    // Step 2: Divide by 4047 constant
+    let totalAcres = sqMeters / 4047;
+    
+    // Step 3: Isolate the full integer part (Acres)
+    let wholeAcres = Math.floor(totalAcres);
+    
+    // Step 4: Extract the exact remainder decimal part
+    let decimalRemainder = totalAcres - wholeAcres;
+    
+    // Step 5: Multiply the decimal remainder by 40 base to derive exact Gunthas and round it to whole number
+    let calculatedGunthas = decimalRemainder * 40;
+    let displayGunthas = Math.round(calculatedGunthas);
+    
+    // Update main display panel
+    document.getElementById('finalResult').innerText = `${wholeAcres} Acre and ${displayGunthas} Guntha`;
+
+    // Render step-by-step layout reflecting notebook logic
+    document.getElementById('stepsList').innerHTML = `
+        <div class="step-row">
+            <span class="step-text"><span class="step-num">1 &rarr;</span> ${interpretationText}</span>
+        </div>
+        <div class="step-row">
+            <span class="step-text"><span class="step-num">2 &rarr;</span> Divide by 4047 for Total Acres:</span>
+            <span class="step-calc">${sqMeters} / 4047 = ${totalAcres.toFixed(4)}</span>
+        </div>
+        <div class="step-row">
+            <span class="step-text"><span class="step-num">3 &rarr;</span> Extract Full Acres:</span>
+            <span class="step-calc">${wholeAcres} Acres</span>
+        </div>
+        <div class="step-row">
+            <span class="step-text"><span class="step-num">4 &rarr;</span> Isolate Remainder Fraction:</span>
+            <span class="step-calc">${totalAcres.toFixed(4)} - ${wholeAcres} = ${decimalRemainder.toFixed(4)}</span>
+        </div>
+        <div class="step-row" style="margin-bottom: 0;">
+            <span class="step-text"><span class="step-num">5 &rarr;</span> Convert & Round to Whole Gunthas (&times; 40):</span>
+            <span class="step-calc">${decimalRemainder.toFixed(4)} &times; 40 &rarr; ${displayGunthas}</span>
+        </div>
+    `;
+}
+
+// Automatically execute logic once on load
+processConversion();
+</script>
+
+</body>
+</html>

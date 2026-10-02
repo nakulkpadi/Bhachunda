@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Consent & Undertaking Form Generator</title>
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f9;
+        margin: 0;
+        padding: 12px;
+    }
+    
+    .no-print {
+        background: #ffffff;
+        padding: 18px 14px;
+        border-radius: 12px;
+        max-width: 1000px;
+        width: 100%;
+        margin: 0 auto 30px auto;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    /* HEADER & HOME BUTTON STYLES */
+    .form-header-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+
+    .btn-home {
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn-home:hover {
+        background-color: #5a6268;
+    }
+
+    h2 {
+        margin: 0;
+        color: #333;
+        text-align: center;
+        font-size: 20px;
+        flex-grow: 1;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        width: 100%;
+    }
+
+    @media (min-width: 601px) {
+        body {
+            padding: 20px;
+        }
+        .no-print {
+            padding: 25px;
+        }
+        h2 {
+            font-size: 24px;
+        }
+        .form-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    label {
+        font-weight: bold;
+        font-size: 13px;
+        margin-bottom: 5px;
+        color: #555;
+    }
+
+    input, select {
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 16px;
+        font-family: inherit;
+        width: 100%;
+        box-sizing: border-box;
+        background-color: #fff;
+    }
+
+    .owners-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .owner-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        width: 100%;
+    }
+
+    .btn {
+        padding: 12px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .btn-add { 
+        background-color: #28a745; 
+        color: white; 
+        width: 100%;
+    }
+    .btn-remove { 
+        background-color: #dc3545; 
+        color: white; 
+        padding: 10px 14px; 
+        border: none; 
+        border-radius: 6px; 
+        cursor: pointer; 
+        font-weight: bold;
+        white-space: nowrap;
+        font-size: 13px;
+    }
+    .btn-print { 
+        background-color: #007bff; 
+        color: white; 
+        width: 100%; 
+        font-size: 16px; 
+        margin-top: 18px; 
+    }
+    .btn-update { 
+        background-color: #ffc107; 
+        color: #212529; 
+        width: 100%; 
+        font-size: 16px; 
+        margin-top: 18px; 
+        display: none;
+    }
+    .btn-cancel-edit { 
+        background-color: #6c757d; 
+        color: white; 
+        width: 100%; 
+        font-size: 14px; 
+        margin-top: 8px; 
+        display: none;
+    }
+    .btn-reprint {
+        background-color: #007bff;
+        color: white;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 12px;
+        margin-right: 4px;
+    }
+    .btn-edit {
+        background-color: #ffc107;
+        color: #212529;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    .status-select {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        border: 1px solid #ccc;
+        cursor: pointer;
+    }
+
+    .records-card {
+        margin-top: 35px;
+        border-top: 2px dashed #e0e0e0;
+        padding-top: 20px;
+    }
+    .search-container {
+        margin-top: 15px;
+        margin-bottom: 15px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .search-input {
+        padding: 10px 14px;
+        border: 2px solid #007bff;
+        border-radius: 6px;
+        font-size: 15px;
+        flex: 1;
+        min-width: 250px;
+    }
+    .list-action-btns {
+        display: flex;
+        gap: 8px;
+    }
+    .btn-list-action {
+        padding: 10px 14px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 13px;
+        cursor: pointer;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .btn-print-list {
+        background-color: #17a2b8;
+    }
+    .btn-export-list {
+        background-color: #28a745;
+    }
+
+    .records-table-container {
+        overflow-x: auto;
+        margin-top: 10px;
+    }
+    .records-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 14px;
+    }
+    .records-table th {
+        background-color: #f8f9fa;
+        color: #495057;
+        padding: 10px;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+    }
+    .records-table td {
+        padding: 10px;
+        border-bottom: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+
+    .site-footer {
+        margin-top: 25px;
+        padding-top: 15px;
+        border-top: 1px solid #e0e0e0;
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .print-area {
+        display: none;
+    }
+
+    .list-print-container {
+        display: none;
+    }
+
+    /* PRINT STYLES */
+    @page {
+        size: A4 portrait;
+        margin: 10mm 12mm 10mm 12mm !important;
+    }
+
+    @media print {
+        html, body {
+            width: 210mm !important;
+            height: auto !important;
+            background: #ffffff !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-family: Arial, sans-serif;
+            font-size: 13pt !important;
+            color: #000;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        body.printing-forms .print-area {
+            display: block !important;
+            width: 210mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        body.printing-forms .list-print-container {
+            display: none !important;
+        }
+
+        body.printing-list .print-area {
+            display: none !important;
+        }
+
+        body.printing-list .list-print-container {
+            display: block !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .page {
+            width: 210mm !important;
+            height: 297mm !important;
+            max-height: 297mm !important;
+            padding: 12mm 15mm 12mm 15mm !important;
+            margin: 0 auto !important;
+            box-sizing: border-box !important;
+            page-break-before: always !important;
+            page-break-after: always !important;
+            page-break-inside: avoid !important;
+            overflow: hidden !important;
+            position: relative !important;
+            background: #ffffff !important;
+        }
+
+        .page:first-child {
+            page-break-before: avoid !important;
+        }
+
+        .page:last-child {
+            page-break-after: avoid !important;
+        }
+
+        p {
+            line-height: 1.65 !important;
+            margin-bottom: 16px !important;
+            margin-top: 0;
+            text-align: justify;
+            font-size: 12.5pt !important;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px !important;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid #000;
+            padding: 8px 10px !important;
+            font-size: 12pt !important;
+        }
+
+        .header-layout-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px !important;
+        }
+
+        .header-layout-table td {
+            border: none;
+            padding: 4px 0 !important;
+            vertical-align: top;
+            font-size: 13pt !important;
+        }
+
+        .center { text-align: center; }
+        .bold { font-weight: bold; }
+        .title { 
+            font-size: 18pt !important; 
+            font-weight: bold; 
+            text-align: center; 
+            margin-bottom: 20px !important; 
+            text-transform: uppercase; 
+        }
+        
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px !important;
+            font-size: 12.5pt !important;
+        }
+
+        .page-3 {
+            padding: 8mm 12mm 8mm 12mm !important;
+        }
+
+        .page-3 .title {
+            font-size: 15pt !important;
+            margin-bottom: 8px !important;
+        }
+
+        .page-3 .flex-between {
+            margin-bottom: 6px !important;
+            font-size: 11pt !important;
+        }
+
+        .page-3 p {
+            line-height: 1.32 !important;
+            margin-bottom: 6px !important;
+            font-size: 10.2pt !important;
+        }
+
+        .page-3 hr {
+            margin: 4px 0 !important;
+        }
+
+        .page-3 .data-table {
+            margin-bottom: 6px !important;
+        }
+
+        .page-3 .data-table td {
+            padding: 3px 6px !important;
+            font-size: 10pt !important;
+        }
+
+        .signature-section {
+            margin-top: 10px !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-size: 10.5pt !important;
+        }
+
+        .revenue-stamp-box {
+            width: 24mm !important;
+            height: 17mm !important;
+            border: 1px dashed #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 6.5pt !important;
+            color: #666;
+            background-color: #fafafa;
+            padding: 2px;
+            line-height: 1.1;
+        }
+
+        .gu-text {
+            font-family: 'Shruti', 'Gujarati Mohini', 'Nirmala UI', sans-serif;
+        }
+
+        .print-list-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .print-list-table th, .print-list-table td {
+            border: 1px solid #333;
+            padding: 8px 10px;
+            font-size: 11pt;
+            text-align: left;
+        }
+        .print-list-table th {
+            background-color: #eaeaea !important;
+        }
+    }
+</style>
+</head>
+<body class="">
+
+<div class="no-print">
+    <!-- TOP HEADER WITH HOME BUTTON -->
+    <div class="form-header-bar">
+        <a href="index.html" class="btn-home">🏠 Home</a>
+        <h2 id="formTitle">Data Input Form</h2>
+        <div style="width: 80px;"></div> <!-- Spacer to balance header alignment -->
+    </div>
+
+    <form id="landForm">
+        <input type="hidden" id="edit_record_id" value="">
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Date / તારીખ (Calendar Select)</label>
+                <input type="date" id="in_date">
+            </div>
+            <div class="form-group">
+                <label>Survey No. / સર્વે નં.</label>
+                <input type="text" id="in_survey" placeholder="e.g. 542">
+            </div>
+            <div class="form-group">
+                <label>Khata No. / ખાતા નં.</label>
+                <input type="text" id="in_khata" placeholder="e.g. 558">
+            </div>
+            <div class="form-group">
+                <label>H.A.S. (Format: e.g. 1.60.57 or 2.50.70)</label>
+                <input type="text" id="in_has" placeholder="e.g. 1.60.57" oninput="convertLandArea()">
+            </div>
+            <div class="form-group">
+                <label>Acres (Auto-calculated)</label>
+                <input type="text" id="in_acres" placeholder="Auto-calculated" readonly style="background-color: #e9ecef;">
+            </div>
+            <div class="form-group">
+                <label>Guntha (Auto-calculated)</label>
+                <input type="text" id="in_guntha" placeholder="Auto-calculated" readonly style="background-color: #e9ecef;">
+            </div>
+            <div class="form-group">
+                <label>Village English</label>
+                <select id="in_village_en" onchange="handleVillageChange(this.value)">
+                    <option value="Bhavanipur" selected>Bhavanipur</option>
+                    <option value="Bitta">Bitta</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Village Gujarati / ગામ</label>
+                <input type="text" id="in_village_gu" value="ભવાનીપર" placeholder="Auto-filled based on village" readonly style="background-color: #e9ecef;">
+            </div>
+            <div class="form-group">
+                <label>Taluka / તાલુકો</label>
+                <input type="text" id="in_taluka" value="Abdasa" placeholder="e.g. Abdasa">
+            </div>
+            <div class="form-group">
+                <label>District / જીલ્લો</label>
+                <input type="text" id="in_district" value="Kutch" placeholder="e.g. Kutch">
+            </div>
+            <div class="form-group full-width">
+                <label>Mobile No.</label>
+                <input type="text" id="in_mobile" placeholder="e.g. 9921494600">
+            </div>
+
+            <div class="form-group full-width">
+                <label>7/12 Owner Name(s) / જમીન માલિકનું નામ</label>
+                <div class="owners-container" id="ownersContainer">
+                    <div class="owner-row">
+                        <input type="text" class="owner-input" placeholder="e.g. JITENDRA VALJI BHANUSHALI">
+                        <button type="button" class="btn-remove" onclick="removeOwnerField(this)">Remove</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-add" onclick="addOwnerField()" style="margin-top: 10px;">+ Add More Owners</button>
+            </div>
+        </div>
+
+        <button type="button" id="savePrintBtn" class="btn btn-print" onclick="saveAndPrint()">SAVE & PRINT</button>
+        <button type="button" id="updateBtn" class="btn btn-update" onclick="updateRecord()">UPDATE RECORD</button>
+        <button type="button" id="cancelEditBtn" class="btn btn-cancel-edit" onclick="cancelEditMode()">Cancel Edit</button>
+    </form>
+
+    <div class="records-card">
+        <h2>Generated Consent Records</h2>
+        
+        <div class="search-container">
+            <input type="text" id="searchBox" class="search-input" placeholder="🔍 Search by Survey No, Owner Name, or Mobile Number..." oninput="filterRecords()">
+            <div class="list-action-btns">
+                <button type="button" class="btn-list-action btn-print-list" onclick="printRecordsList()">🖨️ Print List</button>
+                <button type="button" class="btn-list-action btn-export-list" onclick="exportRecordsCSV()">📥 Export CSV</button>
+            </div>
+        </div>
+
+        <div class="records-table-container">
+            <table class="records-table">
+                <thead>
+                    <tr>
+                        <th>Sr. no.</th>
+                        <th>Survey Number</th>
+                        <th>Date Generated</th>
+                        <th>First Owner Name</th>
+                        <th>Mobile Number</th>
+                        <th style="text-align: center;">Status</th>
+                        <th style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="consentRecordsBody">
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #888;">Loading records from cloud database...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="site-footer">
+        &copy; 2026 All Rights Reserved | Engineered by Nakul Kapdi
+    </div>
+</div>
+
+<div class="print-area">
+    <div class="page">
+        <div class="title">CONSENT LETTER / સંમતિ પત્ર</div>
+
+        <table class="header-layout-table">
+            <tr>
+                <td style="width: 35%; white-space: nowrap;"><b>Date / તારીખ:</b> <span class="out_date"></span></td>
+                <td style="width: 65%;"><b>Place / સ્થળ:</b> Village. <span class="out_v_en"></span>, Tal. <span class="out_taluka"></span>, <span class="out_district"></span> / ગામ. <span class="out_v_gu"></span> તા. <span class="out_taluka"></span>, <span class="out_district"></span></td>
+            </tr>
+        </table>
+
+        <div class="bold" style="margin-bottom: 8px;">ENGLISH VERSION</div>
+        <p>
+            We, the undersigned, are providing our land located in <span class="out_taluka"></span>, District <span class="out_district"></span> having survey number <span class="out_survey"></span> village <span class="out_v_en"></span>, Tehsil <span class="out_taluka"></span>, and admeasuring H.Are.Sq.Mt. <span class="out_has"></span> acres <span class="out_acres"></span> guntha <span class="out_guntha"></span> (Said Land) on yearly lease to <b>Balarama Novagrid Private Limited (BNPL)</b>, for 29 years and 11 months for development of a Solar Project on the Said Land.
+        </p>
+        <p>
+            We hereby provide our consent for conversion of land from agricultural to non-agricultural status and shall undertake to sign all the necessary documents for submission to the Government Authorities.
+        </p>
+        <p>
+            We also provide our consent to BNPL to appoint Sutariya Law firm to issue public notice and undertake Title Due Diligence for Title Clearance and to receive objections and to undertake such necessary steps required for the said purpose.
+        </p>
+        <p>
+            It is mutually agreed that after the signing of this consent letter, if the title of the land is found to be clear, we will execute the formal lease agreement within two (2) months of the signing of this consent letter.
+        </p>
+
+        <div class="bold gu-text" style="margin-top: 14px; margin-bottom: 8px;">GUJARATI VERSION</div>
+        <p class="gu-text">
+            અમો નીચે હસ્તાક્ષર કરનારાઓ, અમારી જમીન જે ગામ: <span class="out_v_gu"></span>, તાલુકો <span class="out_taluka"></span>, જીલ્લો <span class="out_district"></span> ખાતે આવેલી છે, જેનો સર્વે નંબર <span class="out_survey"></span> છે અને કુલ વિસ્તાર હે.આરે.ચો.મી <span class="out_has"></span>, એકર <span class="out_acres"></span> ગુંઠા <span class="out_guntha"></span> છે (ઉલ્લેખિત જમીન) - તેને ૨૯ વર્ષ અને ૧૧ મહિનાની વાર્ષિક લીઝ પર બાલારામા નોવાગ્રિડ પ્રાઇવેટ લિમિટેડ (BNPL) ને સોલાર પ્રોજેક્ટના વિકાસ માટે આપી રહ્યા છીએ.
+        </p>
+        <p class="gu-text">
+            અમો સદરહું ખેતીની જમીનને હંગામી બિનખેતી (Temporary NA) જમીનમાં રૂપાંતર કરવા માટે અમારી સંમતિ આપીએ છીએ અને સરકારની સત્તાઓ સમક્ષ રજૂઆત માટે જરૂરી તમામ દસ્તાવેજો પર હસ્તાક્ષર કરવાની ખાતરી આપીએ છીએ.
+        </p>
+        <p class="gu-text">
+            અમે BNPL ને સુતરિયા લો ફર્મની નિમણૂક કરવા માટે પણ અમારી સંમતિ આપીએ છીએ જેથી સદરહું જમીન અંગે જાહેર નોટિસ બહાર પાડવામાં આવે, ટાઇટલ ક્લીયરન્સ માટે ટાઇટલ ડ્યુ ડીલીજન્સ હાથ ધરવામાં આવે, કોઈ પણ વાંધા અરજી પ્રાપ્ત કરવામાં આવે અને તે સંબંધિત જરૂરી કાર્યવાહી હાથ ધરવામાં આવે.
+        </p>
+        <p class="gu-text">
+            એ પણ પરસ્પર સંમતિ આપવામાં આવે છે કે આ સંમતિ પત્ર પર હસ્તાક્ષર કર્યા પછી, જો જમીનનું ટાઇટલ ક્લીયર (ચોખ્ખું) માલુમ પડશે, તો આ સંમતિ પત્ર પર હસ્તાક્ષર કર્યાના બે (૨) મહિનાની અંદર અમે રીતસરનો લીઝ એગ્રીમેન્ટ (ભાડા કરાર) કરી આપીશું.
+        </p>
+    </div>
+
+    <div class="page">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 10%;">No. / ક્રમ</th>
+                    <th style="width: 60%;">Name of Owner / Khatedar (English / Gujarati)</th>
+                    <th style="width: 30%;">Signature / સહી</th>
+                </tr>
+            </thead>
+            <tbody id="page2_owner_rows">
+            </tbody>
+        </table>
+
+        <div style="margin-top: 14px;" class="bold">
+            Khata No. / ખાતા નં.: <span class="out_khata"></span>
+        </div>
+
+        <div style="margin-top: 18px;">
+            <div class="bold gu-text" style="font-size: 13pt;">Enclosures / અમે અમારી સંમતિ સાથે નીચે મુજબના દસ્તાવેજો જોડી રહ્યા છીએ:</div>
+            <ol class="gu-text" style="line-height: 1.6; margin-top: 8px; margin-bottom: 0; font-size: 12pt;">
+                <li>કેવાયસી દસ્તાવેજો (આધાર કાર્ડ, પાન કાર્ડ) / KYC Documents</li>
+                <li>જમીન ૭/૧૨ / Land Form - 7/12</li>
+                <li>કેન્સલ ચેક અથવા બેંક પાસબુક / Cancelled Cheque or Bank Passbook</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="page page-3">
+        <div class="title">ચિઠ્ઠી-કમ-બાંહેધરી / Letter-cum-Undertaking</div>
+
+        <div class="flex-between bold">
+            <div>Date / તારીખ: <span class="out_date"></span></div>
+            <div>Place / સ્થળ: <span class="out_v_gu"></span></div>
+        </div>
+
+        <p class="gu-text">
+            <b>ગુજરાતી:</b> અમો નીચે સહી કરનાર ખેડૂત/ખેડૂતો, જમીન માલિક/કબજેદાર તરીકે આથી પુષ્ટિ કરીએ છીએ કે, ૩૫૦ MW પાવર પ્રોજેક્ટ, જેનું પાવર 400 KV ભાચુંડા (અબડાસા) સબસ્ટેશનમાં ફીડ થવાનું છે, તે માટે પ્રોજેક્ટ ડેવલપર M/s Balaram Novagrid Private Limited વતી જમીન ફેસિલિટેટર અને EPC કોન્ટ્રાક્ટર M/s Pahal Green Energy Private Limited તરફથી મારા/અમારા બેંક ખાતામાં રૂ. ૧૦,૦૦૦/- ટોકન ફી તરીકે પ્રાપ્ત કર્યા છે.
+        </p>
+        <p class="gu-text">
+            અમે/અમો સમજીએ છીએ કે ઉપરોક્ત જમીનનો અંતે NA એટલે કે હંગામી બિનખેતી ઉપયોગ માટે રૂપાંતર કરાવવાનું રહેશે.
+        </p>
+        <p class="gu-text">
+            જો મારી/અમારી જમીન સંબંધિત કોઈપણ મુદ્દો, વિવાદ, દસ્તાવેજો ખામી, માલિકી/કબજાની ખામી, રેવન્યુ રેકોર્ડની ખામી અથવા અન્ય કોઈ જમીન સંબંધિત કારણોસર આગળની પ્રક્રિયામાં અડચણ આવે, તો હું/અમે પ્રાપ્ત કરેલી રૂ. ૧૦,૦૦૦/- ટોકન રકમ પરત કરવાની બાંહેધરી આપું/આપીએ છીએ.
+        </p>
+        <p class="gu-text">
+            એ પણ પરસ્પર સંમતિ આપવામાં આવે છે કે આ ચિઠ્ઠી-કમ-બાંહેધરી પર હસ્તાક્ષર કર્યા પછી, જે જમીનનું ટાઇટલ ક્લિયર (ચોખ્ખું) માલુમ પડશે. તો આ ચિઠ્ઠી-કમ-બાંહેધરી પર હસ્તાક્ષર કર્યાના બે (૨) મહિનાની અંદર અમે રીતસરનો લીઝ એગ્રીમેન્ટ (ભાડા કરાર) કરી આપીશું.
+        </p>
+        <p class="gu-text">
+            આ ચિઠ્ઠી/બાંહેધરી મેં/અમે મારી/અમારી સ્વેચ્છાએ અને કોઈપણ દબાણ વગર આપી છે.
+        </p>
+
+        <hr>
+
+        <p>
+            <b>English:</b> I/We, the undersigned farmer/farmers listed below, owner/possessor of land, hereby confirm that I/we have accepted Rs. 10,000/- as token fee in my/our bank account from the land facilitator and EPC contractor M/s Pahal Green Energy Private Limited, on behalf of M/s Balaram Novagrid Private Limited, the project developer for the 350 MW power project to be fed into the 400 kV Bhachunda (Abdasa) Substation.
+        </p>
+        <p>
+            I/We understand that the said land is ultimately required to be converted into NA, i.e. Temporary Non-Agricultural use.
+        </p>
+        <p>
+            In case any land-related issue, dispute, defect in documents, title/possession issue, revenue record issue, or any other issue related to my/our land creates any obstruction in the further process, I/we undertake to return/refund the token amount of Rs. 10,000/- received by me/us.
+        </p>
+        <p>
+            It is mutually agreed that after the signing of this letter-cum-undertaking, if the title of the land is found to be clear, we will execute the formal lease agreement within two (2) months of the signing of this letter-cum-undertaking.
+        </p>
+        <p>
+            This letter/undertaking is given by me/us voluntarily and without any pressure.
+        </p>
+
+        <table class="data-table">
+            <tr>
+                <td style="width: 42%;"><b>સર્વે નં. / Survey No.:</b></td>
+                <td><span class="out_survey"></span></td>
+            </tr>
+            <tr>
+                <td><b>ખાતા નં. / Khata No.:</b></td>
+                <td><span class="out_khata"></span></td>
+            </tr>
+            <tr>
+                <td><b>જમીન માલિકનું નામ / Name of Land Owner:</b></td>
+                <td><span id="p3_owner_table"></span></td>
+            </tr>
+            <tr>
+                <td><b>ગામ / Village:</b></td>
+                <td><span class="out_v_en"></span> / <span class="out_v_gu"></span></td>
+            </tr>
+            <tr>
+                <td><b>તાલુકો / Taluka:</b></td>
+                <td><span class="out_taluka"></span></td>
+            </tr>
+            <tr>
+                <td><b>જીલ્લો / District:</b></td>
+                <td><span class="out_district"></span></td>
+            </tr>
+            <tr>
+                <td><b>મોબાઈલ નં. / Mobile No.:</b></td>
+                <td><span class="out_mobile"></span></td>
+            </tr>
+        </table>
+
+        <div class="signature-section">
+            <div style="width: 50%;">
+                <b>સાક્ષીનું નામ / Witness Name:</b> ____________________<br><br>
+                <b>સાક્ષીની સહી / Signature of Witness:</b> ________________
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; width: 45%;">
+                <div class="revenue-stamp-box">
+                    PASTE REVENUE TICKET HERE<br>(રેવન્યુ સ્ટેમ્પ અહીં ચોંટાડો)
+                </div>
+                <div style="margin-top: 4px; text-align: center; width: 100%; font-size: 10pt;" class="bold">
+                    ખેડૂતની સહી / Farmer's Signature
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="list-print-container" id="listPrintContainer">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="margin: 0; font-size: 16pt;">Generated Consent Records Report</h2>
+        <p style="margin: 5px 0 0 0; font-size: 10pt; color: #555;">Bhachunda Solar Project - Consent Tracking</p>
+    </div>
+    <table class="print-list-table">
+        <thead>
+            <tr>
+                <th>Sr. No.</th>
+                <th>Survey No.</th>
+                <th>Khata No.</th>
+                <th>Date Generated</th>
+                <th>First Owner Name</th>
+                <th>Mobile Number</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="printListTableBody">
+        </tbody>
+    </table>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+        getDatabase, 
+        ref, 
+        push, 
+        set,
+        onValue 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAPHjoSFl3eytfcRJdoZRteD-mqoHCK6vg",
+        authDomain: "bhachunda-solar.firebaseapp.com",
+        databaseURL: "https://bhachunda-solar-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "bhachunda-solar",
+        storageBucket: "bhachunda-solar.firebasestorage.app",
+        messagingSenderId: "830070673428",
+        appId: "1:830070673428:web:fb356c218cb56c60e3d701"
+    };
+
+    window.consentListCache = JSON.parse(localStorage.getItem('consentRecords') || '[]');
+    let database;
+    let consentRef;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        renderTable(window.consentListCache);
+        // Set today's date default
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('in_date').value = today;
+    });
+
+    try {
+        const app = initializeApp(firebaseConfig);
+        database = getDatabase(app);
+        consentRef = ref(database, "consent-forms");
+
+        onValue(consentRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const recordsArray = Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key]
+                }));
+                
+                window.consentListCache = recordsArray;
+                localStorage.setItem('consentRecords', JSON.stringify(recordsArray));
+                renderTable(recordsArray);
+            } else {
+                window.consentListCache = [];
+                renderTable([]);
+            }
+        }, (error) => {
+            alert("Firebase Sync Error: " + error.message);
+            console.error("Firebase Connection Error:", error);
+        });
+    } catch (e) {
+        console.error("Firebase Initialization Failed:", e);
+    }
+
+    window.renderTable = function(records) {
+        const tbody = document.getElementById('consentRecordsBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        if (!records || records.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #888;">No consent form records created yet. Submit a form above.</td></tr>`;
+            return;
+        }
+
+        let index = 1;
+        records.forEach((data) => {
+            const tr = document.createElement('tr');
+            const status = data.status || 'missing';
+
+            if (status === 'received') {
+                tr.style.backgroundColor = '#d4edda';
+            } else if (status === 'sent') {
+                tr.style.backgroundColor = '#fff3cd';
+            } else {
+                tr.style.backgroundColor = '#ffffff';
+            }
+
+            tr.innerHTML = `
+                <td>${index++}</td>
+                <td><b>${data.surveyNo || ''}</b></td>
+                <td>${data.dateGenerated || ''}</td>
+                <td>${data.firstOwner || ''}</td>
+                <td>${data.mobile || ''}</td>
+                <td style="text-align: center;">
+                    <select class="status-select" onchange="updateRecordStatus('${data.id}', this.value)" style="background-color: ${status === 'received' ? '#c3e6cb' : status === 'sent' ? '#ffeeba' : '#fff'};">
+                        <option value="missing" ${status === 'missing' ? 'selected' : ''}>Missing Details</option>
+                        <option value="sent" ${status === 'sent' ? 'selected' : ''}>Sent</option>
+                        <option value="received" ${status === 'received' ? 'selected' : ''}>Received Consent</option>
+                    </select>
+                </td>
+                <td style="text-align: center; white-space: nowrap;">
+                    <button type="button" class="btn-reprint" onclick="reprintConsent('${data.surveyNo}')">Print / Download</button>
+                    <button type="button" class="btn-edit" onclick="editConsent('${data.surveyNo}')">Edit</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    };
+
+    window.updateRecordStatus = async function(recordId, newStatus) {
+        const record = window.consentListCache.find(item => item.id === recordId);
+        if (!record) return;
+
+        record.status = newStatus;
+        localStorage.setItem('consentRecords', JSON.stringify(window.consentListCache));
+        renderTable(window.consentListCache);
+
+        if (database) {
+            try {
+                const recordRef = ref(database, `consent-forms/${recordId}`);
+                await set(recordRef, record);
+            } catch (error) {
+                console.error("Firebase Status Update Error:", error);
+            }
+        }
+    };
+
+    window.filterRecords = function() {
+        const queryVal = document.getElementById('searchBox').value.toLowerCase().trim();
+        if (!window.consentListCache) return;
+
+        if (!queryVal) {
+            renderTable(window.consentListCache);
+            return;
+        }
+
+        const filtered = window.consentListCache.filter(item => {
+            const surveyMatch = (item.surveyNo || '').toLowerCase().includes(queryVal);
+            const mobileMatch = (item.mobile || '').toLowerCase().includes(queryVal);
+            const ownerMatch = (item.owners || []).some(o => o.toLowerCase().includes(queryVal));
+            return surveyMatch || mobileMatch || ownerMatch;
+        });
+
+        renderTable(filtered);
+    };
+
+    window.addOwnerField = function() {
+        const container = document.getElementById('ownersContainer');
+        const row = document.createElement('div');
+        row.className = 'owner-row';
+        row.innerHTML = `
+            <input type="text" class="owner-input" placeholder="e.g. Additional Owner Name">
+            <button type="button" class="btn-remove" onclick="removeOwnerField(this)">Remove</button>
+        `;
+        container.appendChild(row);
+    };
+
+    window.removeOwnerField = function(btn) {
+        const rows = document.querySelectorAll('.owner-row');
+        if (rows.length > 1) {
+            btn.parentElement.remove();
+        } else {
+            alert("At least one owner name is required.");
+        }
+    };
+
+    window.handleVillageChange = function(village) {
+        const guInput = document.getElementById('in_village_gu');
+        if (village === 'Bhavanipur') {
+            guInput.value = 'ભવાનીપર';
+        } else if (village === 'Bitta') {
+            guInput.value = 'બીટા';
+        }
+    };
+
+    window.convertLandArea = function() {
+        const hasVal = document.getElementById('in_has').value.trim();
+        if (!hasVal) {
+            document.getElementById('in_acres').value = '';
+            document.getElementById('in_guntha').value = '';
+            return;
+        }
+
+        const parts = hasVal.split('.');
+        if (parts.length === 3) {
+            const h = parseFloat(parts[0]) || 0;
+            const a = parseFloat(parts[1]) || 0;
+            const s = parseFloat(parts[2]) || 0;
+
+            const totalSqm = (h * 10000) + (a * 100) + s;
+            const totalAcres = totalSqm / 4046.8564224;
+            const acres = Math.floor(totalAcres);
+            const guntha = Math.round((totalAcres - acres) * 40);
+
+            document.getElementById('in_acres').value = acres;
+            document.getElementById('in_guntha').value = guntha;
+        }
+    };
+
+    window.populatePrintDocument = function(data) {
+        document.querySelectorAll('.out_date').forEach(el => el.textContent = data.dateGenerated || '');
+        document.querySelectorAll('.out_survey').forEach(el => el.textContent = data.surveyNo || '');
+        document.querySelectorAll('.out_khata').forEach(el => el.textContent = data.khataNo || '');
+        document.querySelectorAll('.out_has').forEach(el => el.textContent = data.has || '');
+        document.querySelectorAll('.out_acres').forEach(el => el.textContent = data.acres || '');
+        document.querySelectorAll('.out_guntha').forEach(el => el.textContent = data.guntha || '');
+        document.querySelectorAll('.out_v_en').forEach(el => el.textContent = data.villageEn || '');
+        document.querySelectorAll('.out_v_gu').forEach(el => el.textContent = data.villageGu || '');
+        document.querySelectorAll('.out_taluka').forEach(el => el.textContent = data.taluka || '');
+        document.querySelectorAll('.out_district').forEach(el => el.textContent = data.district || '');
+        document.querySelectorAll('.out_mobile').forEach(el => el.textContent = data.mobile || '');
+
+        const p2Body = document.getElementById('page2_owner_rows');
+        p2Body.innerHTML = '';
+        (data.owners || []).forEach((owner, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="text-align: center;">${idx + 1}</td>
+                <td><b>${owner}</b></td>
+                <td></td>
+            `;
+            p2Body.appendChild(tr);
+        });
+
+        document.getElementById('p3_owner_table').textContent = (data.owners || []).join(', ');
+    };
+
+    window.saveAndPrint = async function() {
+        const dateGenerated = document.getElementById('in_date').value;
+        const surveyNo = document.getElementById('in_survey').value.trim();
+        const khataNo = document.getElementById('in_khata').value.trim();
+        const has = document.getElementById('in_has').value.trim();
+        const acres = document.getElementById('in_acres').value.trim();
+        const guntha = document.getElementById('in_guntha').value.trim();
+        const villageEn = document.getElementById('in_village_en').value;
+        const villageGu = document.getElementById('in_village_gu').value;
+        const taluka = document.getElementById('in_taluka').value.trim();
+        const district = document.getElementById('in_district').value.trim();
+        const mobile = document.getElementById('in_mobile').value.trim();
+
+        const ownerInputs = document.querySelectorAll('.owner-input');
+        const owners = [];
+        ownerInputs.forEach(input => {
+            if (input.value.trim()) owners.push(input.value.trim());
+        });
+
+        if (!surveyNo || owners.length === 0) {
+            alert("Please fill in Survey Number and at least one Owner Name.");
+            return;
+        }
+
+        const formData = {
+            dateGenerated,
+            surveyNo,
+            khataNo,
+            has,
+            acres,
+            guntha,
+            villageEn,
+            villageGu,
+            taluka,
+            district,
+            mobile,
+            owners,
+            firstOwner: owners[0] || '',
+            status: 'missing'
+        };
+
+        if (database) {
+            try {
+                const newRecordRef = push(consentRef);
+                formData.id = newRecordRef.key;
+                await set(newRecordRef, formData);
+            } catch (err) {
+                console.error("Error saving to Firebase:", err);
+            }
+        }
+
+        populatePrintDocument(formData);
+        document.body.className = 'printing-forms';
+        window.print();
+    };
+
+    window.reprintConsent = function(surveyNo) {
+        const record = window.consentListCache.find(r => r.surveyNo === surveyNo);
+        if (record) {
+            populatePrintDocument(record);
+            document.body.className = 'printing-forms';
+            window.print();
+        }
+    };
+
+    window.editConsent = function(surveyNo) {
+        const record = window.consentListCache.find(r => r.surveyNo === surveyNo);
+        if (!record) return;
+
+        document.getElementById('edit_record_id').value = record.id || '';
+        document.getElementById('in_date').value = record.dateGenerated || '';
+        document.getElementById('in_survey').value = record.surveyNo || '';
+        document.getElementById('in_khata').value = record.khataNo || '';
+        document.getElementById('in_has').value = record.has || '';
+        document.getElementById('in_acres').value = record.acres || '';
+        document.getElementById('in_guntha').value = record.guntha || '';
+        document.getElementById('in_village_en').value = record.villageEn || 'Bhavanipur';
+        document.getElementById('in_village_gu').value = record.villageGu || 'ભવાનીપર';
+        document.getElementById('in_taluka').value = record.taluka || 'Abdasa';
+        document.getElementById('in_district').value = record.district || 'Kutch';
+        document.getElementById('in_mobile').value = record.mobile || '';
+
+        const container = document.getElementById('ownersContainer');
+        container.innerHTML = '';
+        (record.owners || ['']).forEach(owner => {
+            const row = document.createElement('div');
+            row.className = 'owner-row';
+            row.innerHTML = `
+                <input type="text" class="owner-input" value="${owner}" placeholder="e.g. Owner Name">
+                <button type="button" class="btn-remove" onclick="removeOwnerField(this)">Remove</button>
+            `;
+            container.appendChild(row);
+        });
+
+        document.getElementById('formTitle').textContent = "Edit Consent Record";
+        document.getElementById('savePrintBtn').style.display = "none";
+        document.getElementById('updateBtn').style.display = "block";
+        document.getElementById('cancelEditBtn').style.display = "block";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.cancelEditMode = function() {
+        document.getElementById('landForm').reset();
+        document.getElementById('edit_record_id').value = '';
+        document.getElementById('formTitle').textContent = "Data Input Form";
+        document.getElementById('savePrintBtn').style.display = "block";
+        document.getElementById('updateBtn').style.display = "none";
+        document.getElementById('cancelEditBtn').style.display = "none";
+    };
+
+    window.updateRecord = async function() {
+        const recordId = document.getElementById('edit_record_id').value;
+        if (!recordId) return;
+
+        const ownerInputs = document.querySelectorAll('.owner-input');
+        const owners = [];
+        ownerInputs.forEach(input => {
+            if (input.value.trim()) owners.push(input.value.trim());
+        });
+
+        const updatedData = {
+            id: recordId,
+            dateGenerated: document.getElementById('in_date').value,
+            surveyNo: document.getElementById('in_survey').value.trim(),
+            khataNo: document.getElementById('in_khata').value.trim(),
+            has: document.getElementById('in_has').value.trim(),
+            acres: document.getElementById('in_acres').value.trim(),
+            guntha: document.getElementById('in_guntha').value.trim(),
+            villageEn: document.getElementById('in_village_en').value,
+            villageGu: document.getElementById('in_village_gu').value,
+            taluka: document.getElementById('in_taluka').value.trim(),
+            district: document.getElementById('in_district').value.trim(),
+            mobile: document.getElementById('in_mobile').value.trim(),
+            owners,
+            firstOwner: owners[0] || ''
+        };
+
+        if (database) {
+            try {
+                const recordRef = ref(database, `consent-forms/${recordId}`);
+                await set(recordRef, updatedData);
+                alert("Record updated successfully!");
+                cancelEditMode();
+            } catch (err) {
+                console.error("Error updating record:", err);
+            }
+        }
+    };
+
+    window.printRecordsList = function() {
+        const tbody = document.getElementById('printListTableBody');
+        tbody.innerHTML = '';
+        let idx = 1;
+        (window.consentListCache || []).forEach(record => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${idx++}</td>
+                <td>${record.surveyNo || ''}</td>
+                <td>${record.khataNo || ''}</td>
+                <td>${record.dateGenerated || ''}</td>
+                <td>${record.firstOwner || ''}</td>
+                <td>${record.mobile || ''}</td>
+                <td>${record.status || 'missing'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.body.className = 'printing-list';
+        window.print();
+    };
+
+    window.exportRecordsCSV = function() {
+        if (!window.consentListCache || window.consentListCache.length === 0) {
+            alert("No records to export.");
+            return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,Sr No,Survey No,Khata No,Date Generated,First Owner,Mobile,Status\n";
+        window.consentListCache.forEach((r, i) => {
+            csvContent += `${i + 1},"${r.surveyNo || ''}","${r.khataNo || ''}","${r.dateGenerated || ''}","${r.firstOwner || ''}","${r.mobile || ''}","${r.status || 'missing'}"\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Consent_Records_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+</script>
+</body>
+</html>

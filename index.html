@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bachunda Sub Station Solar Project</title>
+    
+    <!-- FAVICON INTEGRATION -->
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+
+    <style>
+        :root {
+            --navy-blue: #0C2340;
+            --brand-green: #2E7D32;
+            --text-muted: #5A7184;
+            --btn-green: #388E3C;
+            --btn-blue: #1E40AF;
+            --btn-gold: #D97706;
+            --btn-teal: #00796B;
+            --footer-bg: #1B4332;
+            --btn-map-color: #7B2CBF;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #FFFFFF;
+            color: var(--navy-blue);
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+        }
+
+        .logo-badge {
+            background: #FFFFFF;
+            padding: 15px 30px 20px 30px;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            width: 180px;
+            text-align: center;
+        }
+
+        .logo-badge img {
+            width: 100%;
+            height: auto;
+            max-height: 105px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .top-nav-bar {
+            position: absolute;
+            top: 25px;
+            left: 5%;
+            z-index: 11;
+        }
+
+        .home-link {
+            color: var(--brand-green);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            position: relative;
+        }
+
+        .home-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 20px;
+            height: 2.5px;
+            background-color: var(--brand-green);
+        }
+
+        .hero-banner-container {
+            width: 100%;
+            min-height: 75vh;
+            background: linear-gradient(to right, rgba(255,255,255,0.95) 25%, rgba(255,255,255,0.2) 60%), url('banner.jpg') center center / cover no-repeat;
+            display: flex;
+            align-items: center;
+            padding: 160px 5% 120px 5%;
+            box-sizing: border-box;
+        }
+
+        .hero-text-block {
+            max-width: 520px;
+            z-index: 2;
+        }
+
+        .clean-energy-tag {
+            color: var(--brand-green);
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+        }
+
+        .hero-text-block h1 {
+            font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.15;
+            color: var(--navy-blue);
+            margin: 0 0 20px 0;
+        }
+
+        .hero-text-block h1 span {
+            color: var(--brand-green);
+            display: block;
+            margin-top: 4px;
+        }
+
+        .hero-text-block p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .portal-grid-container {
+            max-width: 1280px;
+            width: 100%;
+            margin: -90px auto 60px auto;
+            padding: 0 25px;
+            box-sizing: border-box;
+            z-index: 5;
+            position: relative;
+        }
+
+        .layout-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 24px;
+            width: 100%;
+        }
+
+        .ui-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 30px 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 250px;
+            width: 100%;
+            max-width: 270px;
+            flex: 1 1 240px;
+            box-sizing: border-box;
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
+        }
+
+        .ui-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 25px 50px rgba(12, 35, 64, 0.12);
+        }
+
+        .card-top-identity {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .icon-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+
+        .db-theme .icon-wrapper { background-color: #E8F5E9; color: var(--brand-green); }
+        .calc-theme .icon-wrapper { background-color: #FFFDE7; color: #E6A100; }
+        .area-theme .icon-wrapper { background-color: #E0F2FE; color: #0284C7; }
+        .map-theme .icon-wrapper { background-color: #F3E5F5; color: var(--btn-map-color); }
+        .consent-theme .icon-wrapper { background-color: #E0F2F1; color: var(--btn-teal); }
+
+        .card-inner-text h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--navy-blue);
+        }
+
+        .card-inner-text p {
+            margin: 0;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .card-action-btn, .card-trigger-btn {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            color: #FFFFFF;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-sizing: border-box;
+            margin-top: 25px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .bg-green-action { background-color: var(--btn-green); }
+        .bg-gold-action { background-color: var(--btn-gold); }
+        .bg-blue-action { background-color: var(--btn-blue); }
+        .bg-purple-action { background-color: var(--btn-map-color); }
+        .bg-teal-action { background-color: var(--btn-teal); }
+
+        /* FULL SCREEN MODAL STYLES */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(12, 35, 64, 0.85);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-box {
+            background: #FFFFFF;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            animation: modalSlideUp 0.25s ease-out;
+        }
+
+        .modal-header {
+            padding: 1rem 2rem;
+            background: #F8FAFC;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            z-index: 10;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--navy-blue);
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: #CBD5E0;
+            border: none;
+            color: #4A5568;
+            font-size: 1.2rem;
+            font-weight: bold;
+            line-height: 1;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: #A0AEC0;
+            color: #1A202C;
+            transform: scale(1.05);
+        }
+
+        .modal-body {
+            flex: 1;
+            width: 100%;
+            height: calc(100vh - 70px);
+            background: #1E293B;
+            position: relative;
+        }
+
+        .modal-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        footer {
+            background-color: var(--footer-bg) !important;
+            color: #FFFFFF !important;
+            padding: 30px 40px;
+            box-sizing: border-box;
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .footer-max-bounds {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .footer-pill-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #FFFFFF !important;
+        }
+
+        .pill-graphic { font-size: 1.3rem; }
+
+        .dev-signature-row {
+            max-width: 1200px;
+            margin: 20px auto 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.75) !important;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .hero-banner-container { min-height: auto; padding: 160px 20px 100px 20px; }
+            .portal-grid-container { margin-top: -40px; padding: 0 15px; }
+            .ui-card { max-width: 100%; }
+            .footer-max-bounds, .dev-signature-row { flex-direction: column; align-items: flex-start; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-nav-bar">
+        <a href="index.html" class="home-link">Home</a>
+    </div>
+
+    <header>
+        <div class="logo-badge">
+            <img src="logo.png" alt="Bachunda Logo">
+        </div>
+    </header>
+
+    <div class="hero-banner-container">
+        <div class="hero-text-block">
+            <div class="clean-energy-tag">Clean Energy. Brighter Tomorrow. —</div>
+            <h1>Powering Progress, <span>Sustaining Futures</span></h1>
+            <p>Bachunda Sub Station Solar Project is a step towards a greener, stronger and self-reliant tomorrow. Harnessing the power of the sun for communities and generations to come.</p>
+        </div>
+    </div>
+
+    <div class="portal-grid-container">
+        <div class="layout-grid">
+            
+            <!-- 1. DATABASE CARD -->
+            <div class="ui-card db-theme">
+                <div class="card-top-identity">
+                    <div class="icon-wrapper">📂</div>
+                    <div class="card-inner-text">
+                        <h3>Database</h3>
+                        <p>Access and manage project data, land records and important documents.</p>
+                    </div>
+                </div>
+                <a href="database.html" class="card-action-btn bg-green-action">Go to Database &nbsp;➔</a>
+            </div>
+
+            <!-- 2. CONSENT FORM CARD -->
+            <div class="ui-card consent-theme">
+                <div class="card-top-identity">
+                    <div class="icon-wrapper">📝</div>
+                    <div class="card-inner-text">
+                        <h3>Consent Form</h3>
+                        <p>Generate, fill, and print Consent & Undertaking forms for landowners.</p>
+                    </div>
+                </div>
+                <a href="consent_form.html" class="card-action-btn bg-teal-action">Open Consent Form &nbsp;➔</a>
+            </div>
+
+            <!-- 3. AREA CALCULATOR CARD -->
+            <div class="ui-card area-theme">
+                <div class="card-top-identity">
+                    <div class="icon-wrapper">📐</div>
+                    <div class="card-inner-text">
+                        <h3>Area Calculator</h3>
+                        <p>Convert and measure land dimension sizes across multiple dynamic metrics.</p>
+                    </div>
+                </div>
+                <a href="calculator.html" class="card-action-btn bg-blue-action">Open Area Calc &nbsp;➔</a>
+            </div>
+
+            <!-- 4. LEASE RENT CALCULATOR CARD -->
+            <div class="ui-card calc-theme">
+                <div class="card-top-identity">
+                    <div class="icon-wrapper">🧮</div>
+                    <div class="card-inner-text">
+                        <h3>Lease Rent Calculator</h3>
+                        <p>Calculate lease / rent for your land with our easy to use calculator.</p>
+                    </div>
+                </div>
+                <a href="https://nakulkpadi.github.io/LeaseRent-Pro/" class="card-action-btn bg-gold-action">Open Calculator &nbsp;➔</a>
+            </div>
+
+            <!-- 5. PROJECT LAYOUT MAP CARD -->
+            <div class="ui-card map-theme">
+                <div class="card-top-identity">
+                    <div class="icon-wrapper">🗺️</div>
+                    <div class="card-inner-text">
+                        <h3>Project Layout Map</h3>
+                        <p>View the comprehensive site topography blueprint directly in-browser.</p>
+                    </div>
+                </div>
+                <button class="card-trigger-btn bg-purple-action" id="openMapBtn">View Project Map &nbsp;➔</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FULL SCREEN MAP POPUP OVERLAY LAYOUT -->
+    <div id="mapModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Live Project Layout Blueprint</h3>
+                <button class="close-btn" id="closeMapBtn">Close ×</button>
+            </div>
+            <div class="modal-body">
+                <!-- Using iframe for direct inline browser viewing -->
+                <iframe id="pdfFrame"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-max-bounds">
+            <div class="footer-pill-item"><span class="pill-graphic">🌱</span> Clean Energy</div>
+            <div class="footer-pill-item"><span class="pill-graphic">⚡</span> Reliable Power</div>
+            <div class="footer-pill-item"><span class="pill-graphic">👥</span> Community First</div>
+            <div class="footer-pill-item"><span class="pill-graphic">🌐</span> Sustainable Future</div>
+        </div>
+        <div class="dev-signature-row">
+            <span>© 2026 Bachunda Sub Station Solar Project. All Rights Reserved.</span>
+            <span>Designed & Engineered by: <strong>Nakul Kapdi</strong></span>
+        </div>
+    </footer>
+
+    <!-- INTERACTION CONTROLLER -->
+    <script>
+        const modalElement = document.getElementById("mapModal");
+        const triggerOpenBtn = document.getElementById("openMapBtn");
+        const triggerCloseBtn = document.getElementById("closeMapBtn");
+        const pdfFrame = document.getElementById("pdfFrame");
+
+        // Set path to your local PDF file
+        const localPdfPath = "blueprint.pdf";
+
+        triggerOpenBtn.addEventListener("click", () => {
+            // Append cache-buster timestamp and #toolbar=0 to force inline rendering
+            const timestamp = new Date().getTime();
+            pdfFrame.src = `${localPdfPath}?v=${timestamp}#toolbar=0`;
+            
+            modalElement.style.display = "flex";
+            document.body.style.overflow = "hidden";
+        });
+
+        triggerCloseBtn.addEventListener("click", () => {
+            modalElement.style.display = "none";
+            document.body.style.overflow = "auto";
+            pdfFrame.src = ""; // Clear memory
+        });
+    </script>
+</body>
+</html>
