@@ -29,16 +29,30 @@ function indianWords(input){
  if(rem)parts.push(hundred(rem));
  return parts.join(' ')+' Rupees';
 }
-// Offline transliteration is a typing aid, not a certified legal translation.
+// Offline assistance: known terms are translated and proper names are transliterated.
+// A personal/place name's legal spelling cannot be inferred reliably; user approval is required.
 const wordOverride = {
+  'parshotam':'પરશોત્તમ','parshottam':'પરશોત્તમ','parshotamji':'પરશોત્તમજી',
+  'purushottam':'પુરુષોત્તમ','purshotam':'પુરુષોત્તમ','parsotam':'પરશોત્તમ',
+  'devji':'દેવજી','devjibhai':'દેવજીભાઈ','bhanushali':'ભાનુશાળી','bhanusali':'ભાનુશાળી',
   'bhavanipar':'ભવાનીપર','bitta':'બિટ્ટા','abdasa':'અબડાસા','kutch':'કચ્છ',
-  'gujarat':'ગુજરાત','ahmedabad':'અમદાવાદ','rajkot':'રાજકોટ','india':'ભારત',
-  'road':'રોડ','village':'ગામ','survey':'સર્વે','north':'ઉત્તર',
-  'south':'દક્ષિણ','east':'પૂર્વ','west':'પશ્ચિમ','bank':'બેંક',
+  'gujarat':'ગુજરાત','gujarati':'ગુજરાતી','ahmedabad':'અમદાવાદ','rajkot':'રાજકોટ','india':'ભારત',
+  'maharashtra':'મહારાષ્ટ્ર','mumbai':'મુંબઈ','bombay':'મુંબઈ','govind':'ગોવિંદ',
+  'nityshre':'નિત્યશ્રી','nityshree':'નિત્યશ્રી','nitishre':'નિત્યશ્રી','himalaya':'હિમાલય',
+  'nagar':'નગર','building':'બિલ્ડિંગ','plot':'પ્લોટ','flat':'ફ્લેટ','society':'સોસાયટી',
+  'apartment':'એપાર્ટમેન્ટ','apartments':'એપાર્ટમેન્ટ્સ','residency':'રેસિડેન્સી',
+  'road':'રસ્તો','street':'શેરી','lane':'ગલી','near':'પાસે','opposite':'સામે',
+  'behind':'પાછળ','beside':'બાજુમાં','adjacent':'લાગુ પડતો','neighbouring':'પડોશી',
+  'survey':'સર્વે','number':'નંબર','no':'નં.','block':'બ્લોક','khata':'ખાતા',
+  'north':'ઉત્તર','south':'દક્ષિણ','east':'પૂર્વ','west':'પશ્ચિમ',
+  'bank':'બેંક','branch':'શાખા','post':'પોસ્ટ','office':'ઓફિસ','district':'જિલ્લો',
+  'taluka':'તાલુકો','village':'ગામ','city':'શહેર','state':'રાજ્ય',
   'nakul':'નકુલ','kapdi':'કાપડી','patel':'પટેલ','bhai':'ભાઈ','singh':'સિંહ',
   'ram':'રામ','lal':'લાલ','ben':'બેન','jitendra':'જિતેન્દ્ર','mahesh':'મહેશ',
   'ramesh':'રમેશ','kishor':'કિશોર','dharmendra':'ધર્મેન્દ્ર','narendra':'નરેન્દ્ર',
-  'hitesh':'હિતેશ','bhavesh':'ભાવેશ','kumar':'કુમાર','pravinbhai':'પ્રવીણભાઈ'
+  'hitesh':'હિતેશ','bhavesh':'ભાવેશ','kumar':'કુમાર','pravinbhai':'પ્રવીણભાઈ',
+  'mr':'શ્રી','mrs':'શ્રીમતી','shri':'શ્રી','shree':'શ્રી',
+  'acre':'એકર','acres':'એકર','land':'જમીન','landowner':'જમીન માલિક'
 };
 const cons = {'ksh':'ક્ષ','gy':'જ્ઞ','chh':'છ','sh':'શ','ch':'ચ','kh':'ખ','gh':'ઘ','th':'થ','dh':'ધ','ph':'ફ','bh':'ભ','jh':'ઝ','ny':'ઞ','ng':'ઙ','tr':'ત્ર','k':'ક','g':'ગ','c':'ક','j':'જ','t':'ત','d':'દ','n':'ન','p':'પ','b':'બ','m':'મ','y':'ય','r':'ર','l':'લ','v':'વ','w':'વ','s':'સ','h':'હ','f':'ફ','z':'ઝ','q':'ક','x':'ક્સ'};
 const vInd={'aa':'આ','ee':'ઈ','ii':'ઈ','oo':'ઊ','ai':'ઐ','au':'ઔ','a':'અ','e':'એ','i':'ઇ','o':'ઓ','u':'ઉ'};
@@ -46,20 +60,87 @@ const vMat={'aa':'ા','ee':'ી','ii':'ી','oo':'ૂ','ai':'ૈ','au':'ૌ','a
 const ckeys=Object.keys(cons).sort((a,b)=>b.length-a.length);
 const vkeys=Object.keys(vInd).sort((a,b)=>b.length-a.length);
 function translitWord(word){
- const w=word.toLowerCase(); if(wordOverride[w])return wordOverride[w];
- let i=0, out='', isCon=false;
+ const w=word.toLowerCase();if(wordOverride[w])return wordOverride[w];
+ let i=0,out='',isCon=false;
  while(i<w.length){
    if(!/[a-z]/.test(w[i])){out+=word[i];isCon=false;i++;continue;}
    const vowel=vkeys.find(k=>w.startsWith(k,i));
    if(vowel){out+=isCon?vMat[vowel]:vInd[vowel];isCon=false;i+=vowel.length;continue;}
    const consonant=ckeys.find(k=>w.startsWith(k,i));
-   if(consonant){ if(isCon && w[i]!=='h')out+='્';out+=cons[consonant];isCon=true;i+=consonant.length;continue; }
+   if(consonant){if(isCon)out+='્';out+=cons[consonant];isCon=true;i+=consonant.length;continue;}
    i++;isCon=false;
  }
- return out || word;
+ return out||word;
 }
-function autoGujarati(s){
- return String(s||'').replace(/[A-Za-z]+/g,translitWord).replace(/\d/g,d=>GU_DIGITS[+d]);
+const phraseOverrides = [
+  [/\bsurvey\s+(?:no\.?|number)\s*/gi,'સર્વે નં. '],
+  [/\b(?:block\s+)?survey\s+number\s*/gi,'સર્વે નં. '],
+  [/\bplot\s+(?:no\.?|number)\s*/gi,'પ્લોટ નં. '],
+  [/\bflat\s+(?:no\.?|number)\s*/gi,'ફ્લેટ નં. '],
+  [/\bmain\s+road\b/gi,'મુખ્ય રસ્તો'],
+  [/\b(?:opposite|opp\.?)(?:\s+to)?\b/gi,'સામે'],
+  [/\b(?:near|nr\.?)\b/gi,'પાસે'],
+  [/\broad\b/gi,'રસ્તો']
+];
+function autoGujarati(text,kind='general'){
+ let source=String(text||'');
+ // Phrase substitutions must precede per-word conversion.
+ if(kind==='address'||kind==='boundary')for(const [pattern,replacement] of phraseOverrides)source=source.replace(pattern,replacement);
+ return source.replace(/[A-Za-z]+/g,translitWord).replace(/[0-9]/g,d=>GU_DIGITS[+d]);
+}
+const GUJARATI_KEY_ROWS = [
+ 'અ આ ઇ ઈ ઉ ઊ ઋ એ ઐ ઓ ઔ',
+ 'ક ખ ગ ઘ ઙ ચ છ જ ઝ ઞ',
+ 'ટ ઠ ડ ઢ ણ ત થ દ ધ ન',
+ 'પ ફ બ ભ મ ય ર લ વ',
+ 'શ ષ સ હ ળ ક્ષ જ્ઞ',
+ 'ા િ ી ુ ૂ ૃ ે ૈ ો ૌ',
+ 'ં ઃ ઁ ્ ઽ । ૦ ૧ ૨ ૩ ૪',
+ '૫ ૬ ૭ ૮ ૯'
+];
+let openGujaratiKeyboard=null;
+function insertGujarati(target,value){
+ const start=target.selectionStart??target.value.length;
+ const end=target.selectionEnd??start;
+ if(value==='⌫'){
+  if(end>start){target.setRangeText('',start,end,'end');}
+  else if(start>0){const before=target.value.slice(0,start),chars=Array.from(before),last=chars.pop()||'';target.setRangeText('',start-last.length,start,'end');}
+ }else if(value==='Space'){target.setRangeText(' ',start,end,'end');}
+ else if(value==='↵'){target.setRangeText(target.tagName==='TEXTAREA'?'\n':' ',start,end,'end');}
+ else {target.setRangeText(value,start,end,'end');}
+ target.dataset.guEdited='yes';target.dispatchEvent(new Event('input',{bubbles:true}));target.focus();
+}
+function addGujaratiTools(target,english,kind='name'){
+ if(!target||target.dataset.guTools==='yes')return;
+ target.dataset.guTools='yes';target.lang='gu';target.setAttribute('spellcheck','false');
+ target.addEventListener('input',()=>{if(target.dataset.guAutoWriting!=='yes')target.dataset.guEdited='yes';});
+ const tools=document.createElement('div');tools.className='gu-tools';
+ const keyboardBtn=document.createElement('button');keyboardBtn.type='button';keyboardBtn.className='gu-tool-btn';keyboardBtn.textContent='⌨ ગુજરાતી કીબોર્ડ';keyboardBtn.setAttribute('aria-expanded','false');
+ const convertBtn=document.createElement('button');convertBtn.type='button';convertBtn.className='gu-tool-btn';convertBtn.textContent='↻ ફરી ગુજરાતી બનાવો';convertBtn.title='Use English entry again; will replace Gujarati edits in this field';
+ const kb=document.createElement('div');kb.className='gu-keyboard';kb.hidden=true;
+ kb.setAttribute('role','group');kb.setAttribute('aria-label','Gujarati on-screen keyboard');
+ for(const rowChars of GUJARATI_KEY_ROWS){const line=document.createElement('div');line.className='gu-key-row';
+  for(const char of rowChars.split(' ')){const key=document.createElement('button');key.type='button';key.className='gu-key';key.textContent=char;key.setAttribute('aria-label',char);key.addEventListener('mousedown',e=>e.preventDefault());key.addEventListener('click',()=>insertGujarati(target,char));line.append(key);}
+  kb.append(line);
+ }
+ const controls=document.createElement('div');controls.className='gu-key-row';
+ for(const k of ['Space','⌫','↵']){const key=document.createElement('button');key.type='button';key.className='gu-key gu-special';key.textContent=k;key.addEventListener('mousedown',e=>e.preventDefault());key.addEventListener('click',()=>insertGujarati(target,k));controls.append(key);}
+ kb.append(controls);
+ keyboardBtn.addEventListener('click',()=>{if(openGujaratiKeyboard&&openGujaratiKeyboard!==kb){openGujaratiKeyboard.hidden=true;openGujaratiKeyboard.parentElement?.querySelector('.gu-tool-btn')?.setAttribute('aria-expanded','false');}kb.hidden=!kb.hidden;keyboardBtn.setAttribute('aria-expanded',String(!kb.hidden));openGujaratiKeyboard=kb.hidden?null:kb;target.focus();});
+ convertBtn.addEventListener('click',()=>{const source=english?.value||'';target.dataset.guEdited='no';target.dataset.guAutoWriting='yes';target.value=autoGujarati(source,kind);target.dispatchEvent(new Event('input',{bubbles:true}));target.dataset.guAutoWriting='no';target.focus();});
+ tools.append(keyboardBtn,convertBtn);target.insertAdjacentElement('afterend',tools);tools.insertAdjacentElement('afterend',kb);
+}
+function bindGujaratiTranslation(english,gujarati,kind){
+ if(!english||!gujarati)return;
+ let previous='';
+ const sync=()=>{
+  const suggestion=autoGujarati(english.value,kind);
+  if(gujarati.dataset.guEdited!=='yes'&&(!gujarati.value||gujarati.value===previous||gujarati.dataset.guAutoWriting==='yes')){
+   gujarati.dataset.guAutoWriting='yes';gujarati.value=suggestion;gujarati.dataset.guAutoWriting='no';
+  }
+  previous=suggestion;
+ };
+ english.addEventListener('input',sync);addGujaratiTools(gujarati,english,kind);
 }
 const makeField=(text,name,required=false,type='text') => `<label>${text}<input type="${type}" data-name="${name}" ${required?'required':''}/></label>`;
 let ownerCounter = 0;
@@ -71,7 +152,7 @@ function addOwner(data={}){
       ${makeField('Full name in English','nameEn',true)}
       ${makeField('નામ ગુજરાતીમાં (auto-filled; verify)','nameGu',true)}
       ${makeField('Age (years)','age',true,'number')}
-      ${makeField('PAN number','pan',true)}
+      <label>PAN number (10 characters — not DOB)<input data-name="pan" required maxlength="10" pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]" title="Enter 10-character PAN, such as ABCDE1234F" autocomplete="off" /></label>
       <label>Address in English<textarea data-name="addressEn" rows="2" required></textarea></label>
       <label>સરનામું ગુજરાતીમાં (auto-filled; verify)<textarea data-name="addressGu" rows="2" required></textarea></label>
    </div><div class="translit-note">Gujarati is suggested automatically from English and can be corrected for official spelling.</div>`;
@@ -79,11 +160,13 @@ function addOwner(data={}){
   for(const [key,val] of Object.entries(data)){
     const el=div.querySelector(`[data-name="${key}"]`);if(el)el.value=val;
   }
-  for(const [from,to] of [['nameEn','nameGu'],['addressEn','addressGu']]){
+  for(const [from,to,kind] of [['nameEn','nameGu','name'],['addressEn','addressGu','address']]){
     const a=div.querySelector(`[data-name="${from}"]`),b=div.querySelector(`[data-name="${to}"]`);
-    a.dataset.prior='';
-    a.addEventListener('input',()=>{const prev=a.dataset.prior;const suggestion=autoGujarati(a.value);if(!b.value||b.value===prev){b.value=suggestion;b.dataset.auto='true';}a.dataset.prior=suggestion;syncShares();});
+    bindGujaratiTranslation(a,b,kind);
+    a.addEventListener('input',syncShares);
   }
+  const panInput=div.querySelector('[data-name="pan"]');
+  panInput.addEventListener('input',()=>{panInput.value=panInput.value.toUpperCase().replace(/\s/g,'');});
   div.querySelector('.removeOwner').onclick=()=>{
     if(document.querySelectorAll('.owner').length<=1){notify('At least one landowner is required.',true);return;}
     div.remove();renumber();syncShares();recalc();
@@ -169,7 +252,7 @@ function splitEqually(){
  updateShareSummary();
 }
 
-const simpleInputs=['executionDate','effectiveDate','village','survey','khata','has','acre','northEn','northGu','southEn','southGu','eastEn','eastGu','westEn','westGu','signEn','signGu','signAge','signAadhaar','signAddressEn','signAddressGu','advanceTds','advancePayee','advanceUtr','advanceBank','witness1','witness2','advanceVerified'];
+const simpleInputs=['executionDate','effectiveDate','village','survey','khata','has','acre','northEn','northGu','southEn','southGu','eastEn','eastGu','westEn','westGu','signEn','signGu','signAge','signAadhaar','signAddressEn','signAddressGu','advanceTds','advancePayee','advanceUtr','advanceBank','witness1','witness2','witness1Gu','witness2Gu','advanceVerified'];
 function formData(){
  const d={}; for(const k of simpleInputs) d[k]=$(k)?.type==='checkbox'?$(k).checked:($(k)?.value||'');
  d.owners=ownerData();d.rentShares=shareData();return d;
@@ -255,7 +338,8 @@ function buildMapping(d){
   AREA_SUMMARY:$('sqm').value+' Sq. Mtr.; '+d.acre+' Acres',
   RENT_RATE:'55,000',RENT_RATE_WORDS_EN:'Fifty Five Thousand',RENT_RATE_WORDS_GU:rateWordGu,
   SIGNATURES_EN:owners.map((o,i)=>`${i+1}. ${o.nameEn} __________`).join(' ; '),
-  WITNESS_1_EN:d.witness1||'___________________', WITNESS_2_EN:d.witness2||'___________________',
+  WITNESS_1_EN:d.witness1?(d.witness1Gu?`${d.witness1} (${d.witness1Gu})`:d.witness1):'___________________',
+  WITNESS_2_EN:d.witness2?(d.witness2Gu?`${d.witness2} (${d.witness2Gu})`:d.witness2):'___________________',
   RENT_TOTAL:fmt(calc.grand),ANNUAL_AVG:fmt(calc.grand/29.94),CONSIDERATION:fmt((calc.grand/29.94)*2),
   STAMP_NOTICE:'To be confirmed by Sub-Registrar',REG_NOTICE:'To be confirmed by Sub-Registrar'
  };
@@ -279,6 +363,7 @@ function verify(d){
  if(!/^\d+\.\d+\.\d+(?:\.\d+)?$/.test(d.has)||!+($('sqm').value))fail('Enter H.A.S. as e.g. 1.60.57.');
  if(!(Number(d.acre)>0))fail('The land must have a positive acreage.');
  if(!d.owners?.length||d.owners.some(o=>!o.nameEn||!o.nameGu||!o.age||!o.pan))fail('Each listed owner must have complete names, age and PAN.');
+ if(d.owners.some(o=>! /^[A-Z]{5}[0-9]{4}[A-Z]$/.test(o.pan.toUpperCase())))fail('Enter a valid ten-character PAN for each owner. A date of birth is not a PAN.');
  if(!d.rentShares||d.rentShares.length!==d.owners.length)fail('Rent allocation must list every registered landowner.');
  const vals=d.rentShares.map(x=>Number(x.share));
  if(vals.some(x=>!Number.isFinite(x)||x<0||x>100||Math.abs(Math.round(x*100)-x*100)>0.00001)||Math.round(vals.reduce((a,b)=>a+b,0)*100)!==10000)fail('Rent payment percentages must be between 0 and 100 and total exactly 100.00%.');
@@ -357,10 +442,12 @@ function init(){
  $('has').addEventListener('input',()=>{calcArea();recalc();});
  $('acre').addEventListener('input',recalc);
  $('advanceTds').addEventListener('input',()=>{$('advanceTds').dataset.manual='true';recalc();});
- for(const [en,gu] of [['signEn','signGu'],['signAddressEn','signAddressGu'],['northEn','northGu'],['southEn','southGu'],['eastEn','eastGu'],['westEn','westGu']]){
-  let previous='';
-  $(en).addEventListener('input',()=>{const converted=autoGujarati($(en).value);if(!$(gu).value||$(gu).value===previous)$(gu).value=converted;previous=converted;});
- }
+ for(const [en,gu,kind] of [
+  ['signEn','signGu','name'],['signAddressEn','signAddressGu','address'],
+  ['northEn','northGu','boundary'],['southEn','southGu','boundary'],
+  ['eastEn','eastGu','boundary'],['westEn','westGu','boundary'],
+  ['witness1','witness1Gu','name'],['witness2','witness2Gu','name']
+ ])bindGujaratiTranslation($(en),$(gu),kind);
  $('generate').onclick=generate;
  $('exportJson').onclick=()=>{
   const d=formData();

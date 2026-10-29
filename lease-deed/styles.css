@@ -14,3 +14,17 @@
 .share-amounts strong{font-size:15px;color:var(--navy)}
 .share-total.allocation-error{color:var(--error)}
 @media(max-width:520px){.share-amounts{grid-template-columns:1fr}}
+
+/* V3 — Gujarati editing keyboard / proofreading */
+.gu-tools{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0;font-weight:400}
+.gu-tool-btn{border:1px solid #b6cdd0;background:#f0f6f5;color:#1c5147;border-radius:4px;padding:5px 8px;font:600 11px/1.4 "Nirmala UI","Segoe UI",sans-serif;cursor:pointer}
+.gu-tool-btn:hover,.gu-tool-btn:focus-visible{background:#d9eee4;border-color:#429578}
+.gu-keyboard{background:#f6f9fb;border:1px solid #cbdfe0;border-radius:6px;padding:9px;margin-top:6px;box-shadow:0 5px 15px #1c425510;max-width:100%}
+.gu-keyboard[hidden]{display:none}
+.gu-key-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px}
+.gu-key-row:last-child{margin-bottom:0}
+.gu-key{min-width:29px;min-height:30px;flex:1 1 30px;padding:5px 6px;border:1px solid #bdd1d9;background:white;border-radius:4px;color:#1d3e52;font:15px/1.2 "Nirmala UI","Shruti",sans-serif;cursor:pointer}
+.gu-key:hover,.gu-key:focus-visible{background:#e0f2e7;border-color:#44916a}
+.gu-special{font:600 12px/1.2 "Segoe UI",sans-serif;flex:1 1 50px}
+input[lang="gu"],textarea[lang="gu"]{font-family:"Nirmala UI","Shruti",sans-serif;font-size:14px}
+@media(max-width:720px){.gu-key{flex:1 1 30px}.gu-tool-btn{font-size:10px}}
