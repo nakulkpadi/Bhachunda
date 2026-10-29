@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lease Deed Generator · Bhavanipar / Bitta</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="topbar"><div class="shell top-content"><span class="eyebrow">BHACHUNDA SOLAR PROJECT</span><span class="top-tag">LEGAL DOCUMENT WORKSPACE</span></div></div>
+  <header class="shell hero">
+    <div><h1>Lease Deed Generator</h1><p class="subtitle">ભાડાપટ્ટાનો દસ્તાવેજ · English + Gujarati</p><p class="muted">Enter land, owner and payment details once. Generate the complete editable bilingual Word lease deed based on the supplied draft.</p></div>
+    <aside class="hero-stat"><b>29 years 11 months</b><span>Lease term from reference draft</span><hr/><b>5% every 3 years</b><span>Contractual rent escalation</span></aside>
+  </header>
+  <main class="shell layout">
+    <div class="main-col">
+      <form id="leaseForm" novalidate>
+      <section class="panel" id="section-property"><div class="panel-head"><span class="step">01</span><div><h2>Document &amp; land details</h2><p>સ્થળ અને જમીનની વિગતો</p></div></div>
+      <div class="fields grid3">
+        <label>Execution date / દસ્તાવેજ તારીખ <input id="executionDate" type="date" required /></label>
+        <label>Effective date / લીઝ શરૂ થવાની તારીખ <input id="effectiveDate" type="date" required /></label>
+        <label>Village / ગામ<select id="village" required><option value="">Select village</option><option value="Bhavanipar">Bhavanipar — ભવાનીપર</option><option value="Bitta">Bitta — બિટ્ટા</option></select></label>
+        <label>Taluka / તાલુકો<input value="Abdasa / અબડાસા" disabled /></label>
+        <label>District / જિલ્લો<input value="Kutch / કચ્છ" disabled /></label>
+        <label>State / રાજ્ય<input value="Gujarat / ગુજરાત" disabled /></label>
+        <label>Survey / Block No. <input id="survey" required placeholder="e.g. 542" /></label>
+        <label>Khata / Account No. <input id="khata" required placeholder="e.g. 558" /></label>
+        <label>Hectare.Are.Sq.m <input id="has" required placeholder="e.g. 1.60.57" inputmode="decimal" /></label>
+        <label>Area in sq. metres<input id="sqm" readonly /></label>
+        <label>Area in acres (editable)<input id="acre" inputmode="decimal" required /></label>
+        <label>Guntha (reference)<input id="guntha" readonly /></label>
+      </div><p class="hint">H.A.S. is converted as hectare × 10,000 + are × 100 + sq.m. Check the final acreage against the 7/12 record before registration; rounded acreage affects rent.</p>
+      <h3>Four boundaries / ચતુર્દિશાની હદો</h3>
+      <div class="fields grid2" id="boundaries">
+        <label>North / ઉત્તર<input id="northEn" placeholder="Road / neighbouring survey number" /></label><label>ઉત્તર (Gujarati)<input id="northGu" placeholder="ગુજરાતીમાં" /></label>
+        <label>South / દક્ષિણ<input id="southEn" /></label><label>દક્ષિણ (Gujarati)<input id="southGu" /></label>
+        <label>East / પૂર્વ<input id="eastEn" /></label><label>પૂર્વ (Gujarati)<input id="eastGu" /></label>
+        <label>West / પશ્ચિમ<input id="westEn" /></label><label>પશ્ચિમ (Gujarati)<input id="westGu" /></label>
+      </div></section>
+      <section class="panel"><div class="panel-head"><span class="step">02</span><div><h2>Landowners / Lessors</h2><p>સર્વે નંબરમાં નોંધાયેલા તમામ જમીન માલિકો</p></div></div><div id="owners" class="blocks"></div><button type="button" class="secondary" id="addOwner">+ Add landowner</button><p class="hint">Each owner's English and Gujarati name, age, address and PAN should match the official records. Gujarati suggestions are editable and require checking.</p></section>
+      <section class="panel"><div class="panel-head"><span class="step">03</span><div><h2>Lessee's authorized signatory</h2><p>Balarama Novagrid Private Limited</p></div></div><div class="company">Company PAN <strong>AANCB6972G</strong> <span>·</span> CIN <strong>U42201GJ2025PTC164508</strong><br/>Board resolution shown in draft: <strong>13 January 2026</strong></div>
+      <div class="fields grid2"><label>Signatory name (English)<input id="signEn" required placeholder="Name as per authority documents" /></label><label>હસ્તાક્ષરકર્તાનું નામ (Gujarati)<input id="signGu" required /></label><label>Age (years)<input id="signAge" type="number" min="18" max="120" required /></label><label>Aadhaar number (optional — sensitive)<input id="signAadhaar" maxlength="12" inputmode="numeric" placeholder="Use only if required" /></label><label>Residential address (English)<textarea id="signAddressEn" rows="2" required></textarea></label><label>રહેઠાણનું સરનામું (Gujarati)<textarea id="signAddressGu" rows="2" required></textarea></label></div>
+      <p class="hint">The reference deed contains differing English/Gujarati signatory entries. Verify the actual board authority and identity; do not rely on the old draft's personal identifiers.</p>
+      </section>
+      <section class="panel"><div class="panel-head"><span class="step">04</span><div><h2>Lease rent &amp; advance</h2><p>ભાડું અને આગોતરી ચુકવણી</p></div></div>
+      <div class="fields grid3"><label>Annual rent per acre (₹) — FIXED<input id="rent" type="number" value="55000" readonly /></label><label>First two years advance rent (₹) — AUTO<input id="advance" type="number" readonly value="0" /></label><label>TDS on advance (₹) — default 10% per source table<input id="advanceTds" type="number" step="0.01" min="0" value="0" /></label><label>Advance recipients (automatic)<input id="advancePayee" readonly /></label><label>Common UTR / Cheque No. (if one recipient)<input id="advanceUtr" placeholder="For a single recipient; multi-payee UTRs go in Section 05" /></label><label>Common payment bank (if one recipient)<input id="advanceBank" placeholder="Use per-owner entries in Section 05 for multiple payments" /></label></div><p class="hint"><b>Fixed terms:</b> ₹55,000 per acre per year, first TWO years payable in advance and adjusted against Years 1 and 2, 5% escalation every three years. The final 11 months are prorated. Do not change the rent figure in this template.</p><label class="ack"><input type="checkbox" id="advanceVerified"/> Confirm that the two-year advance amount has actually been paid and payment details have been verified (the original deed states “has paid”).</label>
+      <div class="preview-stats"><div><small>Year 1 gross rent</small><strong id="year1Val">—</strong></div><div><small>29y 11m total gross rent</small><strong id="grossVal">—</strong></div><div><small>Advance to adjust</small><strong id="advanceVal">—</strong></div></div>
+      </section>
+      <section class="panel"><div class="panel-head"><span class="step">05</span><div><h2>Rent receiving Lessors</h2><p>ભાડું મેળવનાર જમીન માલિકો</p></div></div>
+      <p class="muted">All registered landowners from Section 02 appear automatically below. Enter the <b>percentage of annual rent</b> payable to each person (0% means they do not receive payments). Total rent distribution must equal <b>100.00%</b>; there is <b>no three-owner limit</b>. These instructions concern rent payments, not changes to ownership in the land.</p>
+      <div class="allocation-toolbar"><button type="button" class="secondary" id="splitEqually">Split rent equally between all landowners</button><span class="hint">Enter custom shares such as 100/0/0/0 or 25/25/25/25.</span></div>
+      <div id="recipients" class="blocks"></div><div class="share-total" id="shareTotal" role="status" aria-live="polite">Total allocation: 100.00%</div>
+      <p class="hint">The source deed's specific equal-share/three-recipient payment wording is revised only in its payment-allocation paragraph and Rent Receiving Lessors table. All other deed clauses remain unchanged. All registered Lessors should approve and sign the agreed split; confirm payment instructions with your legal adviser.</p>
+      </section>
+      <section class="panel"><div class="panel-head"><span class="step">06</span><div><h2>Witnesses &amp; final details</h2><p>સાક્ષીઓ</p></div></div><div class="fields grid2"><label>Witness 1 name<input id="witness1" placeholder="Full name" /></label><label>Witness 2 name<input id="witness2" placeholder="Full name" /></label></div></section>
+      </form>
+    </div>
+    <aside class="sidebar"><div class="sidepanel"><span class="eyebrow">GENERATE DOCUMENT</span><h2>Ready for Word</h2><p>Your output uses the complete uploaded bilingual deed, including schedules, footers and the 30-row rent chart.</p>
+      <button type="button" class="primary" id="generate">Generate .DOCX <span>↓</span></button>
+      <button type="button" class="secondary full" id="exportJson">Export input JSON</button>
+      <label class="upload">Import saved JSON<input type="file" id="importJson" accept=".json,application/json" /></label>
+      <div id="message" aria-live="polite" class="message" role="status"></div>
+      <hr/><p class="hint"><strong>Template source:</strong> complete bilingual lease deed. All unrelated clauses are retained. The payment-direction sentences and receiving-owner table alone are adjusted for user-entered percentage allocations.</p>
+      <p class="hint"><strong>Local preview:</strong> open from a local server or upload folder to GitHub Pages. If opened directly from a disk, select the included template file below.</p>
+      <label class="upload">Select lease_deed_template.docx (local file fallback)<input type="file" id="templateFile" accept=".docx" /></label>
+      <p class="tiny">Word files are assembled in your browser; no form data is uploaded to a server. Import/export JSON is supported locally. The original deed needs lawyer review before registration, including correct land ownership and tax treatment.</p>
+      </div></aside>
+  </main>
+  <footer class="shell footer">LEASE DEED DOCUMENT ENGINE <span>·</span> Developed by WEBNIX STUDIO — www.webnixstudio.in</footer>
+  <script src="jszip.min.js"></script><script src="app.js"></script>
+</body></html>
