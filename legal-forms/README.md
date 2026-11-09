@@ -5,8 +5,9 @@ The home page links separately to `affidavit.html` and
 
 ## Document behaviour
 
-- The document structure and substantive clauses follow the supplied joint
-  affidavit and special power of attorney drafts.
+- The special power of attorney follows the supplied draft. The affidavit is
+  a short joint confirmation of final bank payment instructions, with owner
+  signatures, payment discharge for amounts actually credited, and notarial space.
 - Each village and survey/subdivision has one parcel in Schedule A. The same
   owner may be linked to several parcels in different villages; different
   parcels may have different owners and shares.
@@ -15,24 +16,36 @@ The home page links separately to `affidavit.html` and
 - Farmers can be added and removed. In the power of attorney the Principals
   grant authority; the constituted Attorney is entered separately and may also
   be a co owner of selected parcels.
-- Affidavit rent entitlement and bank credit percentages are separate and must
-  each total 100% for each parcel. Credit to a single account does not change
-  the recorded rent entitlement. Mode B requires an operative instrument.
+- Affidavit payment instructions use clear single-owner (100%) or split-bank
+  payment options. Split percentages must total 100% for every parcel. This
+  confirmation does not transfer ownership or beneficial rent entitlement.
+  A/B modes and the extra lease/instrument sections are removed. Bank name,
+  account and IFSC are required only for owners receiving payments.
+- Company name, PAN, CIN and registered office are fixed for both documents.
+- Area accepts H.A.S. (e.g. 2.29.10) or square metres (22910). Conversion uses
+  the owner-specified 4047 sq m per acre; the remainder times 40 is rounded
+  to whole guntha, carrying 40 guntha into the next acre. Original metric
+  area stays in the document because the conversion is approximate. Select
+  the entire survey or specify the metric area of a leased part.
 - The power of attorney's unwanted Schedule C office/version/page-count table
   is removed. Approved NA documents and annexures are described in plain text.
 - PDF downloads contain selectable text and handle growing documents across
   pages. Word downloads are real editable `.docx` OOXML files. Both exports
   use Letter paper, Times New Roman and the supplied drafts' margins.
 - Empty optional entries become writing lines. Required farmer names,
-  village/survey identity and affidavit allocation totals are checked before
+  village/survey identity, metric area and affidavit bank payment totals are checked before
   export. Optional personal, banking and instrument particulars must still be
   completed and checked before execution.
 
 ## Saved records and privacy
 
 `Save record` stores form data in this browser under a separate key for each
-document type. The list supports search, opening/editing, status tracking and
-regenerating PDF/Word files. Updating a record keeps its ID.
+document type. The list supports search, an explicit Edit button, status tracking and
+regenerating PDF/Word files. Update record keeps the same ID. Existing farmer and bank data are retained.
+Legacy 100% bank directions reopen with the selected recipient. Earlier
+free-text leased areas (such as 5.26) are retained and require confirmation
+of the whole survey or a metric leased part before export; no ambiguous
+decimal-acre interpretation is silently applied.
 
 The saved copy is device storage, not an off-site backup. Clearing browser data
 removes it; download the documents to retain separate copies. Do not enter real
