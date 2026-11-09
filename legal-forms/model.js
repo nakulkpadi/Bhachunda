@@ -10,7 +10,7 @@
   const personName = o => v(o?.name);
   const ownersFor = (s, land) => s.owners.filter(o => land.interests[o.id]?.included);
   function person(o, n) {
-    return p(`${n}. Shri/Smt. ${personName(o)}, aged ${v(o.age)} years, son/daughter/spouse of ${v(o.parent)}, occupation ${v(o.occupation)}, PAN ${v(o.pan)}${o.identification ? `; identification ${o.identification}` : ''}, residing at ${v(o.address)}.`);
+    return p(`${n}. Shri/Smt. ${personName(o)}, aged ${v(o.age)} years, son/daughter/spouse of ${v(o.parent)}, occupation ${v(o.occupation)}, PAN ${v(o.pan)}${o.identification ? `; Aadhaar no. ${o.identification}` : ''}, residing at ${v(o.address)}.`);
   }
   function landBlocks(s) {
     const out = [];

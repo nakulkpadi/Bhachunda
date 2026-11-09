@@ -34,7 +34,7 @@
     wrap.append(el);return wrap;
   }
   function fields(host,obj,list){host.replaceChildren(...list.map(([label,key,options])=>field(label,key,obj,options||{})));}
-  const commonPerson=[['Full legal name *','name',{required:true}],['Parent or spouse name','parent'],['Age in years','age',{type:'number',min:18,max:120,step:1}],['Occupation','occupation'],['PAN','pan',{pattern:'[A-Za-z]{5}[0-9]{4}[A-Za-z]',placeholder:'Optional; 10 characters'}],['Identification document particulars','identification'],['Residential address','address',{area:true,full:true}]];
+  const commonPerson=[['Full legal name *','name',{required:true}],['Parent or spouse name','parent'],['Age in years','age',{type:'number',min:18,max:120,step:1}],['Occupation','occupation'],['PAN','pan',{pattern:'[A-Za-z]{5}[0-9]{4}[A-Za-z]',placeholder:'Optional; 10 characters'}],['Aadhaar number','identification',{placeholder:'Optional; 12-digit Aadhaar number'}],['Residential address','address',{area:true,full:true}]];
   const people=()=>state.owners;
   function renderOwners(){
     $('owners').replaceChildren();

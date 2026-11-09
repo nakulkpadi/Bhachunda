@@ -74,6 +74,9 @@ async function validBase(h,kind){
     }
     if(kind==='spa'){
       const attorneyId=state.attorneyOwnerId,attorney=ctx.LegalData.spaAttorney(state);
+      test(inputFields(ids.owners,'identification').every(el=>el.attributes['aria-label']==='Aadhaar number'),'farmer identification label is Aadhaar number');
+      const withId=structuredClone(state);withId.owners[0].identification='123456789012';const idModel=ctx.LegalModel.build(withId,clauses).map(b=>b.text||'').join(' ');test(idModel.includes('Aadhaar no. 123456789012')&&!idModel.includes('; identification'),'SPA export identifies entered number as Aadhaar');
+      test(ctx.LegalForms.normalise(structuredClone(withId)).owners[0].identification==='123456789012','existing identification values retained under Aadhaar label');
       test(inputFields(ids.attorneyFields,'attorneyOwnerId').length===1&&inputFields(ids.attorneyFields,'name').length===0,'attorney is chosen from existing farmers without duplicate personal entry');
       test(inputFields(ids.attorneyFields,'attorneyOwnerId')[0].children.filter(x=>x.tagName==='option').length===state.owners.length+1,'dropdown contains only farmer list and placeholder');
       test(ctx.LegalData.spaPrincipals(state).length===2&&!ctx.LegalData.spaPrincipals(state).some(o=>o.id===attorneyId),'attorney excluded from the grantors');
