@@ -13,7 +13,7 @@
   const owner=()=>({id:uid(),name:'',parent:'',age:'',occupation:'Agriculture',address:'',pan:'',identification:'',relationship:'',bank:'',branch:'',account:'',ifsc:'',affirmDate:'',affirmPlace:''});
   const interest=()=>({included:true,share:'',rent:'',credit:''});
   const parcel=people=>({id:uid(),village:'Bhavanipar',survey:'',khata:'',tenure:'',totalArea:'',leasedArea:'',north:'',south:'',east:'',west:'',plan:'',mode:'A',areaScope:'whole',leasedHas:'',paymentType:'single',payeeId:people.length===1?people[0].id:'',interests:Object.fromEntries(people.map(o=>[o.id,interest()]))});
-  function fresh(){const owners=Array.from({length:kind==='spa'?3:1},owner);return {schemaVersion:1,kind,id:uid(),status:'Draft',owners,attorney:{...owner(),id:'attorney',coowner:true},parcels:[parcel(kind==='spa'?[...owners,{id:'attorney'}]:owners)],fields:{date:today(),place:kind==='spa'?'Mumbai':'',executionState:'Maharashtra',...LegalData.company,rate:'55000',advance:'First two years in advance, subject to the approved Lease Deed',subRegistrar:'Naliya',language:'English',naDocuments:''},createdAt:new Date().toISOString(),updatedAt:''};}
+  function fresh(){const owners=Array.from({length:kind==='spa'?3:1},owner);return {schemaVersion:1,kind,id:uid(),status:'Draft',owners,...(kind==='spa'?{attorneyOwnerId:''}:{}),attorney:{...owner(),id:'attorney',coowner:true},parcels:[parcel(owners)],fields:{date:today(),place:kind==='spa'?'Mumbai':'',executionState:'Maharashtra',...LegalData.company,rate:'55000',advance:'First two years in advance, subject to the approved Lease Deed',subRegistrar:'Naliya',language:'English',naDocuments:''},createdAt:new Date().toISOString(),updatedAt:''};}
   let state=fresh(),records=[],cloudSession=null,dirty=false,storageHealthy=true;
   let clausesPromise=fetch('source-clauses.json').then(r=>{if(!r.ok)throw Error('Document clauses could not load. Please reload this page.');return r.json();});
   clausesPromise.catch(()=>message('Document clauses could not load. Please reload this page.','error'));
@@ -35,28 +35,27 @@
   }
   function fields(host,obj,list){host.replaceChildren(...list.map(([label,key,options])=>field(label,key,obj,options||{})));}
   const commonPerson=[['Full legal name *','name',{required:true}],['Parent or spouse name','parent'],['Age in years','age',{type:'number',min:18,max:120,step:1}],['Occupation','occupation'],['PAN','pan',{pattern:'[A-Za-z]{5}[0-9]{4}[A-Za-z]',placeholder:'Optional; 10 characters'}],['Identification document particulars','identification'],['Residential address','address',{area:true,full:true}]];
-  const people=()=>[...state.owners,...(kind==='spa'&&state.attorney.coowner?[state.attorney]:[])];
+  const people=()=>state.owners;
   function renderOwners(){
     $('owners').replaceChildren();
     state.owners.forEach((o,i)=>{
       const card=document.createElement('section');card.className='person';card.dataset.owner=o.id;
-      const head=document.createElement('div');head.className='section-head';const title=document.createElement('h3');title.textContent=`${kind==='spa'?'Principal':'Farmer'} ${i+1}${o.name?' — '+o.name:''}`;
+      const head=document.createElement('div');head.className='section-head';const title=document.createElement('h3');title.textContent=`Farmer ${i+1}${o.name?' — '+o.name:''}`;
       const remove=document.createElement('button');remove.type='button';remove.className='danger';remove.textContent='− Remove';remove.disabled=state.owners.length===1;remove.setAttribute('aria-label',`Remove ${kind==='spa'?'principal':'farmer'} ${i+1}`);
-      remove.addEventListener('click',()=>{if(!confirm(`Remove ${o.name||'this farmer'} and their parcel allocations?`))return;state.owners=state.owners.filter(x=>x.id!==o.id);state.parcels.forEach(l=>delete l.interests[o.id]);dirtyState();renderOwners();renderParcels();});
+      remove.addEventListener('click',()=>{if(!confirm(`Remove ${o.name||'this farmer'} and their parcel allocations?`))return;state.owners=state.owners.filter(x=>x.id!==o.id);state.parcels.forEach(l=>delete l.interests[o.id]);if(kind==='spa'&&state.attorneyOwnerId===o.id)state.attorneyOwnerId='';dirtyState();renderOwners();renderAttorney();renderParcels();});
       head.append(title,remove);const grid=document.createElement('div');grid.className='grid';
       const defs=commonPerson.filter(row=>kind==='spa'||row[1]!=='identification').map(row=>[...row]);
-      defs[0]=['Full legal name *','name',{required:true,change:()=>{title.textContent=`${kind==='spa'?'Principal':'Farmer'} ${i+1}${o.name?' — '+o.name:''}`;renderParcels();}}];
-      if(kind==='spa')defs.push(['Relationship to attorney','relationship']);
-      else defs.push(['Bank name','bank'],['Branch','branch'],['Account number','account',{placeholder:'Stored as text; leading zeros retained'}],['IFSC','ifsc',{pattern:'[A-Za-z]{4}0[A-Za-z0-9]{6}'}]);
+      defs[0]=['Full legal name *','name',{required:true,change:()=>{title.textContent=`Farmer ${i+1}${o.name?' — '+o.name:''}`;renderAttorney();renderParcels();}}];
+      if(kind==='affidavit')defs.push(['Bank name','bank'],['Branch','branch'],['Account number','account',{placeholder:'Stored as text; leading zeros retained'}],['IFSC','ifsc',{pattern:'[A-Za-z]{4}0[A-Za-z0-9]{6}'}]);
       fields(grid,o,defs);card.append(head,grid);$('owners').append(card);
     });
   }
   function renderAttorney(){
     if(kind!=='spa')return;$('attorneySection').hidden=false;
-    const defs=commonPerson.map(row=>[...row]);defs[0]=['Attorney full legal name *','name',{required:true,change:renderParcels}];fields($('attorneyFields'),state.attorney,defs);
-    const label=document.createElement('label');label.className='owner-pick full';const cb=document.createElement('input');cb.type='checkbox';cb.checked=state.attorney.coowner;
-    cb.addEventListener('change',()=>{state.attorney.coowner=cb.checked;state.parcels.forEach(l=>{if(cb.checked)l.interests.attorney ||= interest();else delete l.interests.attorney;});dirtyState();renderParcels();});
-    label.append(cb,document.createTextNode('The attorney is also a co owner of one or more parcels'));$('attorneyFields').append(label);
+    fields($('attorneyFields'),state,[['Choose the constituted attorney from the farmers above *','attorneyOwnerId',{required:true,full:true,options:[{value:'',label:'Select an owner / co-owner…'},...state.owners.filter(o=>o.name.trim()).map(o=>({value:o.id,label:o.name}))],change:renderAttorney}]]);
+    const info=document.createElement('p');info.className='hint full';const a=LegalData.spaAttorney(state);
+    info.textContent=a?`${a.name} is the constituted attorney. The other owners grant the power. The attorney’s personal details are taken from the farmer entry above. Select this farmer as an owner of at least one land parcel.`:'Enter the farmers above, including the owner / co-owner who will receive the power. Choose that person here; the remaining owners grant the power.';
+    $('attorneyFields').append(info);
   }
   function renderParcels(){
     $('parcels').replaceChildren();
@@ -77,14 +76,13 @@
       if(land.leasedArea&&!land.areaScope){const previous=document.createElement('p');previous.className='hint full';previous.textContent=`Earlier saved lease-area entry: “${land.leasedArea}”. Confirm Entire survey area or enter the leased part above. Your earlier entry has been retained.`;grid.append(previous);}
       if(kind==='spa'){
         ['north','south','east','west'].forEach(key=>grid.append(field(`${key[0].toUpperCase()+key.slice(1)} boundary`,key,land)));
-        grid.append(field('Verified plan / annexure reference','plan',land,{full:true,placeholder:`e.g. Annexure A${i+1} plan`}));
       }
       const fixed=document.createElement('p');fixed.className='hint';fixed.textContent='Taluka: Abdasa · District: Kutch · State: Gujarat';
       const ownerTitle=document.createElement('h3');ownerTitle.textContent=kind==='spa'?'Owners and verified interests for this parcel':'Owners of this parcel';card.append(head,grid,fixed,ownerTitle);
       people().forEach((o,j)=>{
         land.interests[o.id] ||= {...interest(),included:false};const allocation=land.interests[o.id];
         const row=document.createElement('div');row.className='ownership-row';const label=document.createElement('label');label.className='owner-pick';const cb=document.createElement('input');cb.type='checkbox';cb.checked=allocation.included;cb.dataset.ownerId=o.id;
-        label.append(cb,document.createTextNode(o.name||(o.id==='attorney'?'Attorney':`${kind==='spa'?'Principal':'Farmer'} ${j+1}`)));
+        label.append(cb,document.createTextNode(o.name||(`Farmer ${j+1}`)));
         cb.addEventListener('change',()=>{allocation.included=cb.checked;if(!cb.checked){allocation.credit='0';if(land.payeeId===o.id)land.payeeId='';}dirtyState();renderParcels();});row.append(label);
         if(kind==='spa'&&allocation.included)row.append(field('Verified ownership share','share',allocation,{placeholder:'e.g. 1/4 as per title'}));
         card.append(row);
@@ -115,10 +113,9 @@
       $('leaseTitle').textContent='4. Company receiving this confirmation';fields($('leaseFields'),state.fields,companyFields);
       $('specialSection').hidden=true;$('executionSection').hidden=true;
     }else{
-      const defs=[...companyFields,['Lease Deed date or proposed date','leaseDate',{type:'date'}],['Initial annual rent total (Rs)','totalRent'],['Project name','project'],['Lease commencement','leaseStart',{type:'date'}],['Lease expiry','leaseEnd',{type:'date'}],['Annual rent per acre (Rs)','rate'],['Annual rate in words','rateWords'],['Escalation and intervals','escalation'],['Advance rent and adjustment','advance'],['Deposit and approved treatment','deposit'],['Rent due dates and payment method','paymentMethod'],['Tax allocation and TDS','tax'],['Stamp duty and registration fees paid by','stampParty'],['NA charges and lawful premium paid by','naCharges'],['Conditions before possession','possession',{area:true,full:true}],['Competent Sub Registrar','subRegistrar'],['Annexure B1 date and version','b1Version'],['Annexure B1 total pages','b1Pages'],['Annexure B2 date and total pages','b2Reference']];
-      fields($('leaseFields'),state.fields,defs);
-      $('peopleTitle').textContent='2. Farmers granting the power';$('peopleHelp').textContent='Add the farmers who grant authority as Principals. Enter the person receiving the power separately as the constituted attorney.';$('landTitle').textContent='4. Land parcels';$('leaseTitle').textContent='5. Approved lease details';$('specialTitle').textContent='6. Approved NA documents';$('specialHelp').textContent='Enter the approved documents and annexure references as plain text. The office / version / page-count table has been removed.';
-      fields($('specialFields'),state.fields,[['NA file or project reference','naReference'],['Competent revenue authority and office','naOffice'],['Applicable NA route confirmed by counsel','naRoute',{full:true}],['Approved NA documents and annexure references','naDocuments',{area:true,full:true,placeholder:'List the exact approved applications, consents or declarations and attached final texts.'}]]);
+      fields($('leaseFields'),state.fields,companyFields);
+      $('peopleTitle').textContent='2. Farmers and owners';$('peopleHelp').textContent='Include every owner, including the farmer who will receive the power. Select that farmer in the constituted attorney dropdown below; the other owners grant the power.';
+      $('landTitle').textContent='4. Land parcels';$('leaseTitle').textContent='5. Company concerned';$('specialSection').hidden=true;
       fields($('executionFields'),state.fields,[['Language understood by the Principals','language'],['Witness 1 full name and address','witness1',{area:true}],['Witness 1 identification','witnessId1'],['Witness 2 full name and address','witness2',{area:true}],['Witness 2 identification','witnessId2']]);
     }
   }
@@ -128,12 +125,12 @@
     let error='';
     if(!s.owners.length||!s.parcels.length)error='Add at least one farmer and one land parcel.';
     if(s.owners.some(o=>!o.name.trim()))error='Enter the full name of every farmer.';
-    if(kind==='spa'&&!s.attorney.name.trim())error='Enter the constituted attorney’s full name.';
-    const checkedPeople=[...s.owners,...(kind==='spa'?[s.attorney]:[])];
+    if(kind==='spa'&&!LegalData.spaAttorney(s))error='Select the constituted attorney from the listed farmers / owners.';
+    if(kind==='spa'&&s.owners.length<2)error='Add at least two farmers: an owner granting the power and an owner / co-owner receiving it.';
+    const checkedPeople=s.owners;
     if(checkedPeople.some(o=>o.age!==''&&o.age!=null&&(!Number.isInteger(Number(o.age))||Number(o.age)<18||Number(o.age)>120)))error='Any age entered must be a whole number between 18 and 120.';
     if(checkedPeople.some(o=>o.pan&&!/^[A-Za-z]{5}[0-9]{4}[A-Za-z]$/.test(o.pan)))error='Check the PAN format: five letters, four digits and one letter.';
     if(kind==='affidavit'&&s.owners.some(o=>o.ifsc&&!/^[A-Za-z]{4}0[A-Za-z0-9]{6}$/.test(o.ifsc)))error='Check the IFSC format: four letters, zero, then six letters or digits.';
-    if(kind==='spa'&&s.owners.some(o=>o.name.trim().toLowerCase()===s.attorney.name.trim().toLowerCase()))error='The attorney must be entered separately from the Principals granting the power.';
     const seen=new Set(),linked=new Set();
     s.parcels.forEach((land,i)=>{
       const ref=`Parcel A${i+1}`;
@@ -142,7 +139,7 @@
       const identity=`${land.village}:${land.survey.trim().toLowerCase().replace(/\s/g,'')}`;if(seen.has(identity))error=`${ref}: this village and survey already exists. Use one row per survey.`;seen.add(identity);
       const selected=LegalModel.ownersFor(s,land);if(!selected.length)error=`${ref}: select the owners of this parcel.`;
       selected.forEach(o=>linked.add(o.id));
-      if(kind==='spa'&&!selected.some(o=>o.id!=='attorney'))error=`${ref}: select at least one Principal granting authority for this parcel.`;
+      if(kind==='spa'&&!selected.some(o=>o.id!==s.attorneyOwnerId))error=`${ref}: select at least one Principal granting authority for this parcel.`;
       const totalArea=LegalData.parseHas(land.totalArea),leasedArea=LegalData.area(land);
       if(!totalArea||!leasedArea||!['whole','part'].includes(land.areaScope))error=`${ref}: confirm the area covered and enter a valid hectare.are.sq m area, such as 2.29.10.`;
       else if(leasedArea.total>totalArea.total)error=`${ref}: the leased part cannot exceed the total survey area.`;
@@ -157,18 +154,20 @@
         selected.filter(o=>Number(land.interests[o.id].credit)>0).forEach(o=>{if(!o.bank.trim()||!o.account.trim()||!o.ifsc.trim())error=`${ref}: enter bank name, account number and IFSC for ${o.name}, who receives rent.`;});
       }
     });
+    if(kind==='spa'&&s.attorneyOwnerId&&!linked.has(s.attorneyOwnerId))error='The constituted attorney must be an owner / co-owner of at least one listed parcel.';
     if(s.owners.some(o=>!linked.has(o.id)))error='Link every listed farmer to at least one land parcel, or remove the unused farmer.';
 
     if(error){message(error,'error');return false;}return true;
   }
   function normalise(s){
-    if(!s||s.schemaVersion!==1||s.kind!==kind||typeof s.id!=='string'||!/^[A-Za-z0-9-]{1,80}$/.test(s.id)||!Array.isArray(s.owners)||!s.owners.length||s.owners.length>100||!Array.isArray(s.parcels)||!s.parcels.length||s.parcels.length>200||!s.fields||!s.attorney)throw Error('A saved record has an unsupported format.');
+    if(!s||s.schemaVersion!==1||s.kind!==kind||typeof s.id!=='string'||!/^[A-Za-z0-9-]{1,80}$/.test(s.id)||!Array.isArray(s.owners)||!s.owners.length||s.owners.length>(kind==='spa'?101:100)||!Array.isArray(s.parcels)||!s.parcels.length||s.parcels.length>200||!s.fields||!s.attorney)throw Error('A saved record has an unsupported format.');
     if(s.owners.some(o=>!o||typeof o.id!=='string'||!/^[A-Za-z0-9-]{1,80}$/.test(o.id)||typeof o.name!=='string')||new Set(s.owners.map(o=>o.id)).size!==s.owners.length)throw Error('A saved record has invalid farmer data.');
     if(s.parcels.some(l=>!l||!villages.includes(l.village)||typeof l.survey!=='string'||!l.interests))throw Error('A saved record has invalid parcel data.');
     s.owners=s.owners.map(o=>Object.fromEntries(Object.keys(owner()).map(k=>[k,typeof o[k]==='string'?o[k].slice(0,1800):''])));
     s.attorney={...Object.fromEntries(Object.keys(owner()).map(k=>[k,typeof s.attorney[k]==='string'?s.attorney[k].slice(0,1800):''])),id:'attorney',coowner:s.attorney.coowner===true};
     s.fields=Object.fromEntries(Object.entries(s.fields).filter(([k,v])=>/^[A-Za-z][A-Za-z0-9]{0,50}$/.test(k)&&typeof v==='string').map(([k,v])=>[k,v.slice(0,1800)]));
-    const ids=[...s.owners.map(o=>o.id),...(kind==='spa'&&s.attorney.coowner?['attorney']:[])];
+    if(kind==='spa')LegalData.migrateSpa(s);
+    const ids=s.owners.map(o=>o.id);
     s.parcels=s.parcels.map(l=>({...Object.fromEntries(Object.keys(parcel([])).filter(k=>k!=='interests').map(k=>[k,typeof l[k]==='string'?l[k].slice(0,1800):''])),mode:l.mode==='B'?'B':'A',interests:Object.fromEntries(ids.map(id=>{const a=l.interests[id]||{};return [id,{included:a.included===true,share:String(a.share??'').slice(0,220),rent:String(a.rent??'').slice(0,20),credit:String(a.credit??'').slice(0,20)}];}))}));
     Object.assign(s.fields,LegalData.company);s.parcels.forEach(l=>LegalData.migrateParcel(l,kind));
     s.status=['Draft','Signed','Registered'].includes(s.status)?s.status:'Draft';return s;
@@ -198,8 +197,8 @@
   }
   async function saveRecord(){
     if(!validate())return;const saved=structuredClone(state);saved.updatedAt=new Date().toISOString();saved.savedTo='Device';
-    if(!upsert(saved))return;state=saved;dirty=false;renderRecords();$('saveBtn').textContent='Update record';$('editState').textContent=`Saved on this device · ${state.status}`;message('Record saved on this device.');
-    if(cloudSession){await cloudSave(saved);saved.savedTo='Device + Firebase';upsert(saved);state=structuredClone(saved);renderRecords();$('editState').textContent=`Saved on device and Firebase · ${state.status}`;message('Record saved on this device and Firebase.');}
+    if(!upsert(saved))return;state=saved;dirty=false;if(kind==='spa')renderForm();renderRecords();$('saveBtn').textContent='Update record';$('editState').textContent=`Saved on this device · ${state.status}`;message('Record saved on this device.');
+    if(cloudSession){await cloudSave(saved);saved.savedTo='Device + Firebase';upsert(saved);state=structuredClone(saved);if(kind==='spa')renderForm();renderRecords();$('editState').textContent=`Saved on device and Firebase · ${state.status}`;message('Record saved on this device and Firebase.');}
   }
   function renderRecords(){
     const q=$('recordSearch').value.toLowerCase().trim();$('records').replaceChildren();
@@ -223,7 +222,7 @@
   }
   function signOut(){cloudSession=null;$('cloudPassword').value='';$('cloudStatus').textContent='Signed out of Firebase. Device records remain available in this browser.';$('refreshCloud').hidden=true;$('signOut').hidden=true;$('cloudBtn').hidden=false;}
   async function busy(action){const buttons=[...document.querySelectorAll('.toolbar button')];buttons.forEach(b=>b.disabled=true);try{await action();}catch(e){message(e.name==='TimeoutError'?'The connection timed out. Your device records remain available.':e.message||'The action could not complete.','error');}finally{buttons.forEach(b=>b.disabled=false);}}
-  $('addOwner').addEventListener('click',()=>{if(state.owners.length>=100)return;const o=owner();state.owners.push(o);state.parcels.forEach(l=>l.interests[o.id]={...interest(),included:state.parcels.length===1});dirtyState();renderOwners();renderParcels();});
+  $('addOwner').addEventListener('click',()=>{if(state.owners.length>=100)return;const o=owner();state.owners.push(o);state.parcels.forEach(l=>l.interests[o.id]={...interest(),included:state.parcels.length===1});dirtyState();renderOwners();renderAttorney();renderParcels();});
   $('addParcel').addEventListener('click',()=>{if(state.parcels.length>=200)return;state.parcels.push(parcel(people()));dirtyState();renderParcels();});
   $('previewBtn').addEventListener('click',()=>busy(async()=>{if(!validate())return;LegalExport.render(LegalModel.build(state,await clausesPromise),$('preview'));$('previewDialog').showModal();}));
   $('closePreview').addEventListener('click',()=>$('previewDialog').close());

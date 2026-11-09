@@ -13,9 +13,11 @@ The home page links separately to `affidavit.html` and
   parcels may have different owners and shares.
 - Villages are Bhavanipar, Bitta and Vandh Timbo. Taluka Abdasa, District Kutch
   and State Gujarat are fixed in both the input page and output.
-- Farmers can be added and removed. In the power of attorney the Principals
-  grant authority; the constituted Attorney is entered separately and may also
-  be a co owner of selected parcels.
+- Farmers can be added and removed. In the power of attorney all farmers are listed once. The constituted
+  Attorney is selected from those farmers and must own / co-own at least one
+  listed parcel. The other owners are the Principals granting the power; the
+  Attorney acts separately in a personal capacity for any own interest. Each
+  covered parcel must have at least one Principal granting authority.
 - Affidavit payment instructions use clear single-owner (100%) or split-bank
   payment options. Split percentages must total 100% for every parcel. This
   confirmation does not transfer ownership or beneficial rent entitlement.
@@ -27,8 +29,12 @@ The home page links separately to `affidavit.html` and
   to whole guntha, carrying 40 guntha into the next acre. Original metric
   area stays in the document because the conversion is approximate. Select
   the entire survey or specify the metric area of a leased part.
-- The power of attorney's unwanted Schedule C office/version/page-count table
-  is removed. Approved NA documents and annexures are described in plain text.
+- The power of attorney covers signing the named company’s lease, registration,
+  NA formalities and necessary related land documents. Lease dates, rent terms,
+  fixed NA document lists and plan/annexure references are not requested or
+  reproduced. Authority remains confined to the named company and land. It
+  does not authorise ownership transfers, mortgages, rent collection, bank
+  changes or delegation. Witness and officer authentication spaces remain.
 - PDF downloads contain selectable text and handle growing documents across
   pages. Word downloads are real editable `.docx` OOXML files. Both exports
   use Letter paper, Times New Roman and the supplied drafts' margins.
@@ -42,7 +48,11 @@ The home page links separately to `affidavit.html` and
 `Save record` stores form data in this browser under a separate key for each
 document type. The list supports search, an explicit Edit button, status tracking and
 regenerating PDF/Word files. Update record keeps the same ID. Existing farmer and bank data are retained.
-Legacy 100% bank directions reopen with the selected recipient. Earlier
+Legacy 100% bank directions reopen with the selected recipient. In older SPA records, a separately entered co-owner attorney is brought into
+the farmer list with parcel links preserved; an earlier non-owner attorney is
+retained as legacy data but must be replaced by a listed owner before export.
+Removed lease and NA fields remain in saved data and are omitted from the form
+and current document. Earlier
 free-text leased areas (such as 5.26) are retained and require confirmation
 of the whole survey or a metric leased part before export; no ambiguous
 decimal-acre interpretation is silently applied.

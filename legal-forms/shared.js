@@ -35,5 +35,24 @@
     }
     return land;
   }
-  window.LegalData={company,parseHas,convert,area,areaText,migrateParcel};
+  const spaAttorney=s=>s.owners.find(o=>o.id===s.attorneyOwnerId)||null;
+  const spaPrincipals=s=>s.owners.filter(o=>o.id!==s.attorneyOwnerId);
+  function migrateSpa(s){
+    if(s.kind!=='spa')return s;
+    // Earlier forms stored a co-owner attorney separately. Retain that person and
+    // their parcel interests when moving them into the common farmer list.
+    if(!Object.prototype.hasOwnProperty.call(s,'attorneyOwnerId')){
+      s.attorneyOwnerId='';const a=s.attorney;
+      if(a?.coowner&&a.name?.trim()){
+        const same=s.owners.find(o=>o.name.trim().toLowerCase()===a.name.trim().toLowerCase()&&String(o.parent||'').trim().toLowerCase()===String(a.parent||'').trim().toLowerCase()&&(!o.pan||!a.pan||o.pan.toUpperCase()===a.pan.toUpperCase()));
+        let id=same?.id;
+        if(!id){id='attorney';let suffix=1;while(s.owners.some(o=>o.id===id))id=`attorney-${suffix++}`;s.owners.push({...a,id});}
+        s.attorneyOwnerId=id;
+        s.parcels.forEach(l=>{const previous=l.interests.attorney;if(!previous)return;const current=l.interests[id];l.interests[id]=current?{...previous,...current,included:previous.included||current.included,share:current.share||previous.share}: {...previous};if(id!=='attorney')delete l.interests.attorney;});
+      }
+    }
+    if(typeof s.attorneyOwnerId!=='string'||!s.owners.some(o=>o.id===s.attorneyOwnerId))s.attorneyOwnerId='';
+    return s;
+  }
+  window.LegalData={company,parseHas,convert,area,areaText,migrateParcel,spaAttorney,spaPrincipals,migrateSpa};
 })();

@@ -34,7 +34,7 @@ function buttons(node,text){return descendants(node,c=>c.tagName==='button'&&c.t
 async function validBase(h,kind){
   const {ids}=h;
   for(const [i,el] of inputFields(ids.owners,'name').entries())await enter(el,`Farmer ${i+1} Example`);
-  if(kind==='spa')await enter(inputFields(ids.attorneyFields,'name')[0],'Attorney Example');
+  if(kind==='spa')await enter(inputFields(ids.attorneyFields,'attorneyOwnerId')[0],h.ctx.LegalForms.getState().owners.at(-1).id);
   await enter(inputFields(ids.parcels,'survey')[0],'423');
   await enter(inputFields(ids.parcels,'totalArea')[0],'2.29.10');
   if(kind==='affidavit'){await enter(inputFields(ids.owners,'bank')[0],'Example Bank');await enter(inputFields(ids.owners,'account')[0],'000123456789');await enter(inputFields(ids.owners,'ifsc')[0],'TEST0001234');}
@@ -72,6 +72,32 @@ async function validBase(h,kind){
       const restored=ctx.LegalForms.normalise(oldThree);test(restored.parcels.every(l=>l.paymentType==='single'&&l.payeeId==='legacy-owner-0'),'three-owner legacy direction keeps sole payment recipient');test(ctx.LegalForms.validate(restored),'three-owner 100/0/0 bank direction needs bank details only for recipient');test(restored.owners.every((o,i)=>o.id===oldThree.owners[i].id),'migration retains farmer IDs');
 
     }
+    if(kind==='spa'){
+      const attorneyId=state.attorneyOwnerId,attorney=ctx.LegalData.spaAttorney(state);
+      test(inputFields(ids.attorneyFields,'attorneyOwnerId').length===1&&inputFields(ids.attorneyFields,'name').length===0,'attorney is chosen from existing farmers without duplicate personal entry');
+      test(inputFields(ids.attorneyFields,'attorneyOwnerId')[0].children.filter(x=>x.tagName==='option').length===state.owners.length+1,'dropdown contains only farmer list and placeholder');
+      test(ctx.LegalData.spaPrincipals(state).length===2&&!ctx.LegalData.spaPrincipals(state).some(o=>o.id===attorneyId),'attorney excluded from the grantors');
+      const principalText=blocks.slice(blocks.findIndex(b=>b.text==='1. The Principals granting the power')+1,blocks.findIndex(b=>b.text==='2. The Constituted Attorney')).map(b=>b.text||'').join(' ');
+      test(!principalText.includes(attorney.name)&&state.owners.filter(o=>o.id!==attorneyId).every(o=>principalText.includes(o.name)),'only remaining owners grant the power in output');
+      test(blocks.filter(b=>b.kind==='table'&&b.headers.includes('Capacity')).every(b=>b.rows.length===3&&b.rows.filter(row=>row[1]==='Attorney as co owner').length===1),'each parcel lists chosen attorney once');
+      test(ids.specialSection.hidden&&inputFields(ids.leaseFields,'leaseDate').length===0&&inputFields(ids.leaseFields,'rate').length===0&&inputFields(ids.parcels,'plan').length===0,'all requested SPA fields removed');
+      test(!/Schedule B|Schedule C|Annexure B1|Annexure B2|Verified plan|NA file or project reference|Initial annual rent/.test(text),'removed sections and cross references absent from generated SPA');
+      test(text.includes('Related documents.')&&text.includes('NA formalities.')&&text.includes('BALARAMA NOVAGRID PRIVATE LIMITED'),'authority covers company lease and related NA documents');
+      invalid=structuredClone(state);invalid.attorneyOwnerId='outside-person';test(!ctx.LegalForms.validate(invalid),'third party attorney ID rejected');
+      invalid=structuredClone(state);invalid.attorneyOwnerId='';test(!ctx.LegalForms.validate(invalid),'attorney selection required');
+      invalid=structuredClone(state);invalid.parcels.forEach(l=>l.interests[attorneyId].included=false);test(!ctx.LegalForms.validate(invalid),'selected attorney must own a listed parcel');
+      invalid=structuredClone(state);invalid.owners=invalid.owners.filter(o=>o.id===attorneyId);test(!ctx.LegalForms.validate(invalid),'owner cannot grant power to self without another principal');
+      invalid=structuredClone(state);invalid.parcels[0].interests=Object.fromEntries(state.owners.map(o=>[o.id,{included:o.id===attorneyId,share:''}]));test(!ctx.LegalForms.validate(invalid),'each covered parcel needs an owner granting authority');
+      const legacy=structuredClone(state);delete legacy.attorneyOwnerId;legacy.attorney={...state.owners[0],id:'attorney',name:'Legacy Coowner Example',coowner:true};legacy.parcels.forEach(l=>{l.interests.attorney={included:true,share:'1/4',rent:'',credit:''};l.plan='OLD-PLAN-DO-NOT-EXPORT';});legacy.fields.leaseDate='2031-01-23';legacy.fields.naDocuments='OLD-NA-DO-NOT-EXPORT';legacy.fields.totalRent='987654321';
+      const restored=ctx.LegalForms.normalise(legacy);test(restored.owners.length===4&&restored.attorneyOwnerId==='attorney','legacy coowner attorney moves into farmer list');
+      test(restored.parcels.every(l=>l.interests[restored.attorneyOwnerId].included&&l.interests[restored.attorneyOwnerId].share==='1/4'),'legacy attorney parcel interests retained');
+      test(restored.id===state.id&&restored.fields.leaseDate==='2031-01-23'&&restored.fields.naDocuments==='OLD-NA-DO-NOT-EXPORT'&&restored.parcels[0].plan==='OLD-PLAN-DO-NOT-EXPORT','removed field data and record ID retained');
+      const restoredText=ctx.LegalModel.build(restored,clauses).map(b=>b.text||b.rows.flat().join(' ')).join(' ');test(!/OLD-PLAN|OLD-NA|987654321|23\/01\/2031/.test(restoredText),'old lease NA and plan entries excluded from current export');
+      test(ctx.LegalForms.validate(restored),'migrated coowner record remains valid');
+      test(ctx.LegalForms.normalise(structuredClone(restored)).owners.length===4,'repeated normalisation does not duplicate attorney');
+      const duplicate=structuredClone(state);delete duplicate.attorneyOwnerId;duplicate.attorney={...state.owners[0],id:'attorney',coowner:true};duplicate.parcels.forEach(l=>l.interests.attorney={included:true,share:'1/3'});const merged=ctx.LegalForms.normalise(duplicate);test(merged.owners.length===3&&merged.attorneyOwnerId===state.owners[0].id,'legacy duplicate owner entry resolves to existing farmer');
+      const outsider=structuredClone(state);delete outsider.attorneyOwnerId;outsider.attorney={...state.owners[0],id:'attorney',name:'Legacy Coowner Example',coowner:false};const restricted=ctx.LegalForms.normalise(outsider);test(restricted.attorneyOwnerId===''&&restricted.attorney.name==='Legacy Coowner Example'&&restricted.owners.length===3,'legacy non owner not offered or silently promoted to owner');test(!ctx.LegalForms.validate(restricted),'legacy non owner requires choosing a farmer before export');
+    }
     await ids.saveBtn.click();test(h.store.size===1,'local save succeeds');test(ids.records.textContent.includes('220/1'),'record list includes all surveys');
     await ids.saveBtn.click();test(JSON.parse([...h.store.values()][0]).length===1,'editing save does not create a duplicate');
     const reloaded=boot(kind,h.store);test(reloaded.ids.records.textContent.includes('Bitta 220/1'),'records survive reload');
@@ -94,6 +120,13 @@ async function validBase(h,kind){
       test(again.ctx.LegalForms.getState().owners[0].account==='000123456789','bank leading zeros retained through edit');
       const first=again.ctx.LegalForms.getState().parcels[0];await enter(inputFields(again.ids.parcels,'paymentType')[0],'split');await buttons(again.ids.parcels,'Split equally')[0].click();
       test(Object.values(again.ctx.LegalForms.getState().parcels[0].interests).filter(a=>a.included).every(a=>a.credit==='50'),'equal split assigns 50/50');
+    }
+    if(kind==='spa'){
+      const oldId=reloaded.ctx.LegalForms.getState().attorneyOwnerId;
+      await enter(inputFields(reloaded.ids.owners,'name')[2],'Renamed Coowner Example');test(inputFields(reloaded.ids.attorneyFields,'attorneyOwnerId')[0].value===oldId,'selected attorney survives farmer name edits');
+      await reloaded.ids.saveBtn.click();const again=boot(kind,reloaded.store);await buttons(again.ids.records,'Edit')[0].click();test(again.ctx.LegalForms.getState().attorneyOwnerId===oldId,'chosen owner attorney survives saved edit and reload');
+      await buttons(again.ids.owners,'− Remove')[2].click();test(again.ctx.LegalForms.getState().attorneyOwnerId===''&&!again.ctx.LegalForms.validate(),'removing selected farmer clears attorney and prevents export');
+      const newId=reloaded.ctx.LegalForms.getState().owners[0].id;await enter(inputFields(reloaded.ids.attorneyFields,'attorneyOwnerId')[0],newId);test(reloaded.ctx.LegalData.spaAttorney(reloaded.ctx.LegalForms.getState()).id===newId,'attorney can change to another listed farmer');
     }
     const s=reloaded.ctx.LegalForms.getState();s.owners[0].name='<img src=x onerror=alert(1)>';
     const host=new Element('article');ctx.LegalExport.render(ctx.LegalModel.build(s,clauses),host);
